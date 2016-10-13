@@ -1,15 +1,29 @@
 #pragma once
 
-#ifdef LIBGRASS_EXPORTS
-#define LIBGRASS_API __declspec(dllexport)
+#ifdef _WIN32
+    #include <Windows.h>
+    #ifdef LIBGRASS_EXPORTS
+    #define LIBGRASS_API __declspec(dllexport)
+    #else
+    #define LIBGRASS_API __declspec(dllimport)
+    #endif
+    #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+    // Windows Header Files:
+    #include <windows.h>
 #else
-#define LIBGRASS_API __declspec(dllimport)
+    #ifdef LIBGRASS_EXPORTS
+        #define LIBGRASS_API __attribute__((visibility("default")))
+    #else
+        #define LIBGRASS_API
+    #endif
+    #define CP_UTF8 65001
+    #define CP_ACP 0
+    typedef wchar_t WCHAR;
 #endif
 
 #include <string>
 #include <vector>
 #include <sstream>
-#include <Windows.h>
 
 // segment
 LIBGRASS_API void train_segmentor(const std::string & train_file, const std::string & feature_file, const std::string & dict_file, int times, int encoding = CP_UTF8);
