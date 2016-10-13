@@ -60,7 +60,7 @@ namespace Segment {
 		std::ifstream input(sInputFile);
 		std::ofstream output(sOutputFile);
 
-		static std::string period = GBK2UTF8("¡£");
+		static std::string period = "ã€‚";
 
 		if (input) {
 			std::string line;
@@ -95,7 +95,7 @@ namespace Segment {
 		std::string line = sInput;
 		if (e == CP_ACP) line = GBK2UTF8(line);
 		int pos = -1;
-		static std::string period = GBK2UTF8("¡£");
+		static std::string period = "ã€‚";
 
 		while ((pos = line.find(period)) != std::string::npos && pos != line.size() - period.size()) {
 			tagsentence.clear();

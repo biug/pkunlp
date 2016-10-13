@@ -67,14 +67,14 @@ LIBGRASS_API void delete_segmentor()
 	segmentor = nullptr;
 }
 
-//Êı¾İÎªÒ»¾ä»°Ò»ĞĞ
+//æ•°æ®ä¸ºä¸€å¥è¯ä¸€è¡Œ
 LIBGRASS_API void seg_file(const std::string & input_file, const std::string & output_file, int encoding) {
 	if (segmentor != nullptr) {
 		segmentor->parse(input_file, output_file, encoding);
 	}
 }
 
-//·Ö´ÊÑµÁ·Êı¾İÎªÒ»ĞĞÒ»¸ö´Ê£¬Ã¿¸ö¾ä×ÓÖ®¼ä¿ÕÒ»ĞĞ
+//åˆ†è¯è®­ç»ƒæ•°æ®ä¸ºä¸€è¡Œä¸€ä¸ªè¯ï¼Œæ¯ä¸ªå¥å­ä¹‹é—´ç©ºä¸€è¡Œ
 LIBGRASS_API void train_segmentor(const std::string & train_file, const std::string & feature_file, const std::string & dict_file, int times, int encoding) {
 	if (segmentor == nullptr) {
 		std::ios_base::sync_with_stdio(false);
@@ -116,14 +116,14 @@ LIBGRASS_API void delete_postagger()
 	postagger = nullptr;
 }
 
-//Êı¾İÎªÒ»¾ä»°Ò»ĞĞ£¬µ¥´ÊÖ®¼ä¿Õ¸ñ
+//æ•°æ®ä¸ºä¸€å¥è¯ä¸€è¡Œï¼Œå•è¯ä¹‹é—´ç©ºæ ¼
 LIBGRASS_API void tag_file(const std::string & input_file, const std::string & output_file, int encoding) {
 	if (postagger != nullptr) {
 		postagger->parse(input_file, output_file, encoding);
 	}
 }
 
-//´ÊĞÔ±ê×¢ÑµÁ·Êı¾İÎªÒ»ĞĞÒ»¸ö´ÊºÍ¶ÔÓ¦´ÊĞÔ£¬Ã¿¸ö¾ä×ÓÖ®¼ä¿ÕÒ»ĞĞ
+//è¯æ€§æ ‡æ³¨è®­ç»ƒæ•°æ®ä¸ºä¸€è¡Œä¸€ä¸ªè¯å’Œå¯¹åº”è¯æ€§ï¼Œæ¯ä¸ªå¥å­ä¹‹é—´ç©ºä¸€è¡Œ
 LIBGRASS_API void train_postagger(const std::string & train_file, const std::string & feature_file, int times, int encoding)
 {
 	if (postagger == nullptr) {
@@ -417,9 +417,9 @@ LIBGRASS_API std::string semantic_parse_string(const std::string & input, int en
 
 LIBGRASS_API void sentence_per_line(const std::string & input_file, const std::string & output_file, int encoding) {
 
-	std::string period = GBK2UTF8("¡£");
-	std::string question = GBK2UTF8("£¿");
-	std::string exclamation = GBK2UTF8("£¡");
+	std::string period = "ã€‚";
+	std::string question = "ï¼Ÿ";
+	std::string exclamation = "ï¼";
 
 	std::ifstream input(input_file);
 	std::ofstream output(output_file);

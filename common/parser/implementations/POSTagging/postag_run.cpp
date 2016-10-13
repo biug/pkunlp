@@ -101,7 +101,7 @@ namespace POSTagging {
 		if (sInput.empty()) return "";
 		std::string input = sInput;
 		if (e == CP_ACP) input = GBK2UTF8(input);	// UTF8 Encoding
-		static std::string period = GBK2UTF8("¡£");
+		static std::string period = "ã€‚";
 		std::stringstream ss(sInput);
 		WordSentence wordsentence;
 		TagSentence tagsentence, correct;
@@ -128,7 +128,7 @@ namespace POSTagging {
 		WordSentence wordsentence;
 		TagSentence tagsentence, correct;
 		std::string word;
-		static std::string period = GBK2UTF8("¡£");
+		static std::string period = "ã€‚";
 		for (const auto & word : vecInput) {
 			if (e == CP_ACP) {
 				wordsentence.push_back(GBK2UTF8(word));
