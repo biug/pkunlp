@@ -257,7 +257,7 @@ std::vector<std::vector<int>> CoNLL08DepGraph::stronglyComponet(bool connected) 
 				}
 				// from last recursion
 				if (info.second != -1) {
-					vecLow[v] = min(vecLow[v], vecLow[vecLink[info.second]]);
+					vecLow[v] = std::min(vecLow[v], vecLow[vecLink[info.second]]);
 				}
 				bool nextRecursion = false;
 				for (int j = info.second + 1, max_j = vecLink.size(); j < max_j; ++j) {
@@ -269,7 +269,7 @@ std::vector<std::vector<int>> CoNLL08DepGraph::stronglyComponet(bool connected) 
 						break;
 					}
 					else if (inStack[link]) {
-						vecLow[v] = min(vecLow[v], vecDFN[link]);
+						vecLow[v] = std::min(vecLow[v], vecDFN[link]);
 					}
 				}
 				if (nextRecursion) {

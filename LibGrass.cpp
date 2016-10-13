@@ -6,10 +6,10 @@
 #include <sstream>
 #include <iomanip>
 #include "LibGrass.h"
-#include "common\parser\implementations\Segment\seg_run.h"
-#include "common\parser\implementations\POSTagging\postag_run.h"
-#include "common\parser\implementations\arceager\arceager_depparser.h"
-#include "common\parser\implementations\graph_transition\titov\titov_run.h"
+#include "common/parser/implementations/Segment/seg_run.h"
+#include "common/parser/implementations/POSTagging/postag_run.h"
+#include "common/parser/implementations/arceager/arceager_depparser.h"
+#include "common/parser/implementations/graph_transition/titov/titov_run.h"
 
 Segment::Run* segmentor = nullptr;
 POSTagging::Run* postagger = nullptr;

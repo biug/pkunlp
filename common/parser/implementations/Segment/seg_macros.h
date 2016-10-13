@@ -2,6 +2,7 @@
 #define _Segment_MACROS_H
 
 #include <sstream>
+#include <cstring>
 #include "common/parser/macros_base.h"
 #include "include/learning/perceptron/packed_score.h"
 
