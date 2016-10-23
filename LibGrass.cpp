@@ -5,17 +5,20 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 #include "LibGrass.h"
 #include "common/parser/implementations/Segment/seg_run.h"
 #include "common/parser/implementations/POSTagging/postag_run.h"
 #include "common/parser/implementations/arceager/arceager_depparser.h"
 #include "common/parser/implementations/graph_transition/titov/titov_run.h"
 
-Segment::Run* segmentor = nullptr;
+std::vector<Segment::Run*> segmentors(1, nullptr); // use segmentors[0] as default segmentor for backward compatibility
+Segment::Run*& segmentor = segmentors[0]; // reference pointed to segmentors[0]
 POSTagging::Run* postagger = nullptr;
 arceager::DepParser * syntax_parser = nullptr;
 arceager::DepParser * psdtr_parser = nullptr;
 titov::DepParser<PackedScoreType> * semantic_parser = nullptr;
+
 
 std::string toHalfWidth(const std::string & input) {
 	std::string temp;
@@ -49,8 +52,7 @@ std::string toHalfWidth(const std::string & input) {
 	return temp;
 }
 
-LIBGRASS_API void create_segmentor(const std::string & feature_file, const std::string & dict_file)
-{
+LIBGRASS_API void create_segmentor(const std::string & feature_file, const std::string & dict_file) {
 	if (segmentor == nullptr) {
 		std::ios_base::sync_with_stdio(false);
 		std::cin.tie(NULL);
@@ -61,17 +63,69 @@ LIBGRASS_API void create_segmentor(const std::string & feature_file, const std::
 	}
 }
 
-LIBGRASS_API void delete_segmentor()
-{
-	delete segmentor;
-	segmentor = nullptr;
+LIBGRASS_API int create_segmentor_ctx(const std::string & feature_file, const std::string & dict_file) {
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(NULL);
+
+	int idx = (int) segmentors.size();
+	Segment::Run* new_segmentor = new Segment::Run();
+	new_segmentor->initParser(feature_file, feature_file, dict_file, true);
+	std::cout << "segmentor " << idx << "created" << std::endl;
+	segmentors.push_back(new_segmentor);
+	return idx;
+}
+
+extern "C" int create_segmentor_ctx(const char* feature_file, const char* dict_file) {
+    return create_segmentor_ctx(std::string(feature_file), std::string(dict_file));
+};
+
+extern "C" LIBGRASS_API void delete_segmentor_ctx(int idx) {
+	delete segmentors[idx];
+	segmentors[idx] = nullptr;
+}
+
+LIBGRASS_API void delete_segmentor() {
+	delete_segmentor_ctx(0);
 }
 
 //数据为一句话一行
-LIBGRASS_API void seg_file(const std::string & input_file, const std::string & output_file, int encoding) {
-	if (segmentor != nullptr) {
-		segmentor->parse(input_file, output_file, encoding);
+LIBGRASS_API void seg_file_with_ctx(int idx, const std::string &input_file, const std::string &output_file,
+									int encoding) {
+	if (segmentors[idx] != nullptr) {
+		segmentors[idx]->parse(input_file, output_file, encoding);
+	} else {
+		throw std::runtime_error("null segmentor");
 	}
+}
+
+extern "C" void seg_file_with_ctx(int idx, const char* input_file, const char* output_file,
+                                  int encoding) {
+    seg_file_with_ctx(idx, std::string(input_file), std::string(output_file), encoding);
+}
+
+LIBGRASS_API void seg_file(const std::string & input_file, const std::string & output_file,
+							   int encoding) {
+	seg_file_with_ctx(0, input_file, output_file, encoding);
+}
+
+//分词训练数据为一行一个词，每个句子之间空一行
+LIBGRASS_API void train_segmentor_ctx(const std::string & train_file, const std::string & feature_file, const std::string & dict_file, int times, int encoding) {
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(NULL);
+
+	int idx = (int) segmentors.size();
+	Segment::Run* new_segmentor = new Segment::Run();
+	new_segmentor->initParser(feature_file, feature_file, dict_file, false);
+	segmentors.push_back(new_segmentor);
+
+	for (int i = 0; i < times; i++)
+		new_segmentor->train(train_file);
+}
+
+extern "C" void train_segmentor_ctx(const char* train_file, const char* feature_file,
+                                    const char* dict_file, int times, int encoding) {
+    train_segmentor_ctx(std::string(train_file), std::string(feature_file), std::string(dict_file),
+                        times, encoding);
 }
 
 //分词训练数据为一行一个词，每个句子之间空一行
@@ -87,15 +141,30 @@ LIBGRASS_API void train_segmentor(const std::string & train_file, const std::str
 		segmentor->train(train_file);
 }
 
-LIBGRASS_API std::vector<std::string> seg_string(const std::string & input, int encoding) {
-	if (segmentor != nullptr) {
+LIBGRASS_API std::vector<std::string> seg_string_with_ctx(int idx, const std::string & input, int encoding) {
+	if (segmentors[idx] != nullptr) {
 		std::vector<std::string> result;
-		std::string sentence = segmentor->parse(input, encoding), word;
+		std::string word, sentence = segmentors[idx]->parse(input, encoding);
 		std::stringstream ss(sentence);
 		while (ss >> word) result.push_back(word);
 		return result;
+	} else {
+		throw std::runtime_error("null segmentor");
 	}
-	return{};
+}
+
+extern "C" const char* seg_string_with_ctx(int idx, const char* input, int encoding) {
+    if (segmentors[idx] != nullptr) {
+        std::vector<std::string> result;
+        segmentors[idx]->parseInput(input, encoding);
+        return (segmentors[idx]->tmpParsingResult).c_str();
+    } else {
+        throw std::runtime_error("null segmentor");
+    }
+}
+
+LIBGRASS_API std::vector<std::string> seg_string(const std::string & input, int encoding) {
+	return seg_string_with_ctx(0, input, encoding);
 }
 
 LIBGRASS_API void create_postagger(const std::string & feature_file)

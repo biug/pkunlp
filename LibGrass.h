@@ -27,14 +27,20 @@
 
 // segment
 LIBGRASS_API void train_segmentor(const std::string & train_file, const std::string & feature_file, const std::string & dict_file, int times, int encoding = CP_UTF8);
+LIBGRASS_API void train_segmentor_ctx(const std::string & train_file, const std::string & feature_file, const std::string & dict_file, int times, int encoding);
 
 LIBGRASS_API void create_segmentor(const std::string & feature_file = "segfeat_PKU", const std::string & dict_file = "dic_PKU");
+LIBGRASS_API int create_segmentor_ctx(const std::string & feature_file, const std::string & dict_file);
 
 LIBGRASS_API void delete_segmentor();
+LIBGRASS_API void delete_segmentor_ctx(int idx);
 
 LIBGRASS_API void seg_file(const std::string & input_file, const std::string & output_file, int encoding = CP_UTF8);
+LIBGRASS_API void seg_file_with_ctx(int idx, const std::string &input_file, const std::string &output_file,
+                                    int encoding = CP_UTF8);
 
 LIBGRASS_API std::vector<std::string> seg_string(const std::string & input, int encoding = CP_UTF8);
+LIBGRASS_API std::vector<std::string> seg_string_with_ctx(int idx, const std::string & input, int encoding);
 
 // postagging
 LIBGRASS_API void train_postagger(const std::string & train_file, const std::string & feature_file, int times, int encoding = CP_UTF8);

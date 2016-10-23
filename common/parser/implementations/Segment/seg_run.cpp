@@ -88,9 +88,10 @@ namespace Segment {
 		output.close();
 	}
 
-	std::string Run::parse(const std::string & sInput, int e) const {
-		std::string result = "";
-		if (sInput.empty()) return "";
+	void Run::parseInput(const std::string & sInput, int e) {
+		std::string& result = tmpParsingResult;
+		tmpParsingResult = "";
+		if (sInput.empty()) return ;
 		TagSentence tagsentence;
 		std::string line = sInput;
 		if (e == CP_ACP) line = GBK2UTF8(line);
@@ -109,7 +110,11 @@ namespace Segment {
 		result += tagsentence[0];
 		for (int i = 1, n = tagsentence.size(); i < n; ++i) result += ' ' + tagsentence[i];
 
-		return result;
+	}
+
+	std::string Run::parse(const std::string & sInput, int e) {
+		parseInput(sInput, e);
+		return std::string(tmpParsingResult);
 	}
 
 	std::vector<std::pair<std::string, std::string>> Run::parse(const std::vector<std::string> & vecInput, int) const {
