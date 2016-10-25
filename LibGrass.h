@@ -1,7 +1,6 @@
 #pragma once
 
 #ifdef _WIN32
-    #include <Windows.h>
     #ifdef LIBGRASS_EXPORTS
     #define LIBGRASS_API __declspec(dllexport)
     #else

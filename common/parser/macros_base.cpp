@@ -9,7 +9,7 @@
 
 #include "macros_base.h"
 #ifdef WIN32
-	#include <Windows.h>
+	#include <windows.h>
 #else
 	#include "common/iconv-wrapper/iconv.hpp"
 #endif

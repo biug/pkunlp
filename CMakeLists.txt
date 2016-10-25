@@ -90,9 +90,16 @@ set(SOURCE_FILES
 
 
 if(STATIC STREQUAL "ON")
-    LIST(APPEND ${SOURCE_FILES} newItem)
-    add_library(grass SHARED ${SOURCE_FILES} common/utils/memcpy.c)
-    target_link_libraries(grass -static-libgcc -static-libstdc++ -Wl,--wrap=memcpy)
+    if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
+    	LIST(APPEND ${SOURCE_FILES} common/utils/memcpy.c)
+    	add_library(grass SHARED ${SOURCE_FILES})
+        target_link_libraries(grass -static-libgcc -static-libstdc++ -Wl,--wrap=memcpy)
+    else()
+    	add_library(grass SHARED ${SOURCE_FILES})
+        target_link_libraries(grass -static-libgcc -static-libstdc++)
+    endif()
 else()
     add_library(grass SHARED ${SOURCE_FILES})
 endif()
+
+target_compile_definitions(grass PRIVATE LIBGRASS_EXPORTS=1)
