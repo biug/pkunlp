@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+
 project(libGrass)
 
+option(STATIC "Statically link to glibc" OFF)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib/)
 include_directories(${PROJECT_SOURCE_DIR})
@@ -83,4 +87,12 @@ set(SOURCE_FILES
     stdafx.h
     targetver.h)
 
-add_library(grass SHARED ${SOURCE_FILES})
+
+
+if(STATIC STREQUAL "ON")
+    LIST(APPEND ${SOURCE_FILES} newItem)
+    add_library(grass SHARED ${SOURCE_FILES} common/utils/memcpy.c)
+    target_link_libraries(grass -static-libgcc -static-libstdc++ -Wl,--wrap=memcpy)
+else()
+    add_library(grass SHARED ${SOURCE_FILES})
+endif()
