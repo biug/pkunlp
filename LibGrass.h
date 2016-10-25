@@ -33,7 +33,7 @@ LIBGRASS_API void create_segmentor(const std::string & feature_file = "segfeat_P
 LIBGRASS_API int create_segmentor_ctx(const std::string & feature_file, const std::string & dict_file);
 
 LIBGRASS_API void delete_segmentor();
-LIBGRASS_API void delete_segmentor_ctx(int idx);
+extern "C" LIBGRASS_API void delete_segmentor_ctx(int idx);
 
 LIBGRASS_API void seg_file(const std::string & input_file, const std::string & output_file, int encoding = CP_UTF8);
 LIBGRASS_API void seg_file_with_ctx(int idx, const std::string &input_file, const std::string &output_file,
