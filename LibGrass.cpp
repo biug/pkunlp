@@ -75,7 +75,7 @@ LIBGRASS_API int create_segmentor_ctx(const std::string & feature_file, const st
 	return idx;
 }
 
-extern "C" int create_segmentor_ctx(const char* feature_file, const char* dict_file) {
+extern "C" LIBGRASS_API int create_segmentor_ctx(const char* feature_file, const char* dict_file) {
     return create_segmentor_ctx(std::string(feature_file), std::string(dict_file));
 };
 
@@ -122,7 +122,7 @@ LIBGRASS_API void train_segmentor_ctx(const std::string & train_file, const std:
 		new_segmentor->train(train_file);
 }
 
-extern "C" void train_segmentor_ctx(const char* train_file, const char* feature_file,
+extern "C" LIBGRASS_API void train_segmentor_ctx(const char* train_file, const char* feature_file,
                                     const char* dict_file, int times, int encoding) {
     train_segmentor_ctx(std::string(train_file), std::string(feature_file), std::string(dict_file),
                         times, encoding);
@@ -153,7 +153,7 @@ LIBGRASS_API std::vector<std::string> seg_string_with_ctx(int idx, const std::st
 	}
 }
 
-extern "C" const char* seg_string_with_ctx(int idx, const char* input, int encoding) {
+extern "C" LIBGRASS_API const char* seg_string_with_ctx(int idx, const char* input, int encoding) {
     if (segmentors[idx] != nullptr) {
         std::vector<std::string> result;
         segmentors[idx]->parseInput(input, encoding);
