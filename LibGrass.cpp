@@ -78,15 +78,6 @@ LIBGRASS_API int create_segmentor_ctx(const std::string & feature_file, const st
 	return idx;
 }
 
-extern "C" LIBGRASS_API int create_segmentor_ctx(const char* feature_file, const char* dict_file) {
-    return create_segmentor_ctx(std::string(feature_file), std::string(dict_file));
-};
-
-extern "C" LIBGRASS_API void delete_segmentor_ctx(int idx) {
-	delete segmentors[idx];
-	segmentors[idx] = nullptr;
-}
-
 LIBGRASS_API void delete_segmentor() {
 	delete_segmentor_ctx(0);
 }
@@ -99,11 +90,6 @@ LIBGRASS_API void seg_file_with_ctx(int idx, const std::string &input_file, cons
 	} else {
 		throw std::runtime_error("null segmentor");
 	}
-}
-
-extern "C" void seg_file_with_ctx(int idx, const char* input_file, const char* output_file,
-                                  int encoding) {
-    seg_file_with_ctx(idx, std::string(input_file), std::string(output_file), encoding);
 }
 
 LIBGRASS_API void seg_file(const std::string & input_file, const std::string & output_file,
@@ -125,11 +111,6 @@ LIBGRASS_API void train_segmentor_ctx(const std::string & train_file, const std:
 		new_segmentor->train(train_file);
 }
 
-extern "C" LIBGRASS_API void train_segmentor_ctx(const char* train_file, const char* feature_file,
-                                    const char* dict_file, int times, int encoding) {
-    train_segmentor_ctx(std::string(train_file), std::string(feature_file), std::string(dict_file),
-                        times, encoding);
-}
 
 //分词训练数据为一行一个词，每个句子之间空一行
 LIBGRASS_API void train_segmentor(const std::string & train_file, const std::string & feature_file, const std::string & dict_file, int times, int encoding) {
@@ -156,15 +137,7 @@ LIBGRASS_API std::vector<std::string> seg_string_with_ctx(int idx, const std::st
 	}
 }
 
-extern "C" LIBGRASS_API const char* seg_string_with_ctx(int idx, const char* input, int encoding) {
-    if (segmentors[idx] != nullptr) {
-        std::vector<std::string> result;
-        segmentors[idx]->parseInput(input, encoding);
-        return (segmentors[idx]->tmpParsingResult).c_str();
-    } else {
-        throw std::runtime_error("null segmentor");
-    }
-}
+
 
 LIBGRASS_API std::vector<std::string> seg_string(const std::string & input, int encoding) {
 	return seg_string_with_ctx(0, input, encoding);
@@ -195,15 +168,6 @@ LIBGRASS_API int create_postagger_ctx(const std::string & feature_file)
     return idx;
 }
 
-extern "C" int create_postagger_ctx(char* feature_file) {
-    return create_postagger_ctx(std::string(feature_file));
-}
-
-extern "C" LIBGRASS_API void delete_postagger_ctx(int idx)
-{
-    delete postaggers[idx];
-    postaggers[idx] = nullptr;
-}
 
 LIBGRASS_API void delete_postagger()
 {
@@ -217,10 +181,6 @@ LIBGRASS_API void tag_file_with_ctx(int idx, const std::string & input_file, con
     } else {
         throw std::runtime_error("null postagger.");
     }
-}
-
-extern "C" void tag_file_with_ctx(int idx, char* input_file, char* output_file, int encoding) {
-    tag_file_with_ctx(idx, std::string(input_file), std::string(output_file), encoding);
 }
 
 LIBGRASS_API void tag_file(const std::string & input_file, const std::string & output_file, int encoding) {
@@ -242,11 +202,6 @@ LIBGRASS_API int train_postagger_ctx(const std::string & train_file, const std::
         postagger->train(train_file);
 
     return idx;
-}
-
-extern "C" int train_postagger_ctx(char* train_file, char* feature_file, int times, int encoding)
-{
-    return train_postagger_ctx(std::string(train_file), std::string(feature_file), times, encoding);
 }
 
 //词性标注训练数据为一行一个词和对应词性，每个句子之间空一行
@@ -273,14 +228,6 @@ LIBGRASS_API std::vector<std::pair<std::string, std::string>> tag_sentence_with_
 
 LIBGRASS_API std::vector<std::pair<std::string, std::string>> tag_sentence(const std::vector<std::string> & input, int encoding) {
 	return tag_sentence_with_ctx(0, input, encoding);
-}
-
-extern "C" POSTagging::TaggingResult tag_sentence_with_ctx(int idx, char** input, int length, int encoding) {
-	if (postaggers[idx] != nullptr) {
-		return postaggers[idx]->parseToResult(input, length, encoding);
-	} else {
-		throw std::runtime_error("null postagger.");
-	}
 }
 
 LIBGRASS_API void train_syntax_parser(const std::string & input_file, const std::string & feature_file, int round)
@@ -584,3 +531,60 @@ LIBGRASS_API void sentence_per_line(const std::string & input_file, const std::s
 		}
 	}
 }
+
+extern "C" {
+LIBGRASS_API int create_segmentor_ctx(const char *feature_file, const char *dict_file) {
+    return create_segmentor_ctx(std::string(feature_file), std::string(dict_file));
+} ;
+
+LIBGRASS_API void delete_segmentor_ctx(int idx) {
+    delete segmentors[idx];
+    segmentors[idx] = nullptr;
+}
+
+void seg_file_with_ctx(int idx, const char *input_file, const char *output_file,
+                       int encoding) {
+    seg_file_with_ctx(idx, std::string(input_file), std::string(output_file), encoding);
+}
+
+LIBGRASS_API void train_segmentor_ctx(const char *train_file, const char *feature_file,
+                                      const char *dict_file, int times, int encoding) {
+    train_segmentor_ctx(std::string(train_file), std::string(feature_file), std::string(dict_file),
+                        times, encoding);
+}
+
+LIBGRASS_API const char *seg_string_with_ctx(int idx, const char *input, int encoding) {
+    if (segmentors[idx] != nullptr) {
+        std::vector <std::string> result;
+        segmentors[idx]->parseInput(input, encoding);
+        return (segmentors[idx]->tmpParsingResult).c_str();
+    } else {
+        throw std::runtime_error("null segmentor");
+    }
+}
+
+int create_postagger_ctx(char *feature_file) {
+    return create_postagger_ctx(std::string(feature_file));
+}
+
+LIBGRASS_API void delete_postagger_ctx(int idx) {
+    delete postaggers[idx];
+    postaggers[idx] = nullptr;
+}
+
+void tag_file_with_ctx(int idx, char *input_file, char *output_file, int encoding) {
+    tag_file_with_ctx(idx, std::string(input_file), std::string(output_file), encoding);
+}
+
+int train_postagger_ctx(char *train_file, char *feature_file, int times, int encoding) {
+    return train_postagger_ctx(std::string(train_file), std::string(feature_file), times, encoding);
+}
+
+POSTagging::TaggingResult tag_sentence_with_ctx(int idx, char **input, int length, int encoding) {
+    if (postaggers[idx] != nullptr) {
+        return postaggers[idx]->parseToResult(input, length, encoding);
+    } else {
+        throw std::runtime_error("null postagger.");
+    }
+}
+};
