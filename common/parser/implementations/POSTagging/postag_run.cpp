@@ -13,7 +13,23 @@
 
 namespace POSTagging {
 
-	void Run::initParser(const std::string & sFeatureInput, const std::string & sFeatureOutput, const std::string & sDictPath, bool parse) {
+	WordWithTag::WordWithTag(const char* word, const char* tag) {
+        this->word = word;
+        this->tag = tag;
+    }
+
+    ManagedWordWithTag::ManagedWordWithTag(const std::string word, const std::string tag) {
+        this->word = word;
+        this->tag = tag;
+    }
+
+    WordWithTag ManagedWordWithTag::c_str() {
+        return WordWithTag(word.c_str(), tag.c_str());
+    }
+
+    TaggingResult::TaggingResult(WordWithTag *words, int length) : words(words), length(length) {}
+
+    void Run::initParser(const std::string & sFeatureInput, const std::string & sFeatureOutput, const std::string & sDictPath, bool parse) {
 		m_pPOSTagger.reset(new DepParser(sFeatureInput, sFeatureOutput, !parse));
 	}
 
@@ -121,6 +137,54 @@ namespace POSTagging {
 		return result.substr(1);
 	}
 
+	TaggingResult Run::parseToResult(char** vecInput, int length, int e) {
+		parsingResult.clear();
+
+		if (!length) {
+            std::cout << "no input" << std::endl;
+            return TaggingResult(nullptr, 0);
+        }
+		if (length >= MAX_SEG_SIZE) {
+            std::cout << "input too long" << std::endl;
+            return TaggingResult(nullptr, 0);
+        }
+
+		WordSentence wordsentence;
+		TagSentence tagsentence, correct;
+
+		static std::string period = "。";
+		for (int i=0; i<length; i++) {
+			std::string word(vecInput[i]);
+			if (e == CP_ACP) {
+				wordsentence.push_back(GBK2UTF8(word));
+				correct.push_back(GBK2UTF8(word));
+			}
+			else {
+				wordsentence.push_back(word);
+				correct.push_back(word);
+			}
+			if (wordsentence.back() == period || i == length - 1) {
+                if (wordsentence.size() >= MAX_SEG_SIZE) {
+                    std::cout << "input too long" << std::endl;
+                    return TaggingResult(nullptr, 0);
+                }
+				m_pPOSTagger->parse(wordsentence, correct, &tagsentence);
+				for (int j = 0, n = (int) wordsentence.size(); j < n; ++j) {
+					parsingResult.push_back({ wordsentence[j], tagsentence[j] });
+				}
+				wordsentence.clear();
+				tagsentence.clear();
+				correct.clear();
+			}
+		}
+
+		storedResult.clear();
+		for(auto& i : parsingResult) {
+			storedResult.push_back(i.c_str());
+		}
+		return TaggingResult(storedResult.data(), (int) storedResult.size());
+	}
+
 	std::vector<std::pair<std::string, std::string>> Run::parse(const std::vector<std::string> & vecInput, int e) const {
 		std::vector<std::pair<std::string, std::string>> result;
 		if (vecInput.empty()) return {};
@@ -151,5 +215,4 @@ namespace POSTagging {
 		}
 		return result;
 	}
-
 }

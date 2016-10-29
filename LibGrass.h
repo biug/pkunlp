@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <common/parser/implementations/POSTagging/postag_run.h>
 
 // segment
 LIBGRASS_API void train_segmentor(const std::string & train_file, const std::string & feature_file, const std::string & dict_file, int times, int encoding = CP_UTF8);
@@ -43,14 +44,23 @@ LIBGRASS_API std::vector<std::string> seg_string_with_ctx(int idx, const std::st
 
 // postagging
 LIBGRASS_API void train_postagger(const std::string & train_file, const std::string & feature_file, int times, int encoding = CP_UTF8);
+LIBGRASS_API int train_postagger_ctx(const std::string & train_file, const std::string & feature_file, int times, int encoding);
+extern "C" int train_postagger_ctx(char* train_file, char* feature_file, int times, int encoding);
 
 LIBGRASS_API void create_postagger(const std::string & feature_file = "posfeat_PKU");
+LIBGRASS_API int create_postagger_ctx(const std::string & feature_file);
+extern "C" int create_postagger_ctx(char* feature_file);
 
 LIBGRASS_API void delete_postagger();
+extern "C" LIBGRASS_API void delete_postagger_ctx(int idx);
 
 LIBGRASS_API void tag_file(const std::string & input_file, const std::string & output_file, int encoding = CP_UTF8);
+LIBGRASS_API void tag_file_with_ctx(int idx, const std::string & input_file, const std::string & output_file, int encoding);
+extern "C" void tag_file_with_ctx(int idx, char* input_file, char* output_file, int encoding);
+
 
 LIBGRASS_API std::vector<std::pair<std::string, std::string>> tag_sentence(const std::vector<std::string> & input, int encoding = CP_UTF8);
+extern "C" POSTagging::TaggingResult tag_sentence_with_ctx(int idx, char** input, int length, int encoding);
 
 // syntax tree
 LIBGRASS_API void train_syntax_parser(const std::string & input_file, const std::string & feature_file, int round);

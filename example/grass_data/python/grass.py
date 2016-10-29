@@ -2,8 +2,10 @@
 ## encoding: utf-8
 from __future__ import unicode_literals, print_function
 import ctypes
+import six
 import sys
 import platform
+from collections import defaultdict, namedtuple
 
 
 def detect_lib_name():
@@ -32,13 +34,47 @@ class Segmentor(object):
     def __init__(self, feature_file, dict_file):
         self.segmentor = grass.create_segmentor_ctx(feature_file, dict_file)
 
-    def seg_string(self, input_str, encoding=b"UTF-8"):
-        if isinstance(input_str, unicode):
+    def seg_string(self, input_str, encoding="UTF-8"):
+        if isinstance(input_str, six.text_type):
             input_str = input_str.encode(encoding)
-        return grass.seg_string_with_ctx(self.segmentor, input_str, UTF8).decode(encoding)
+        return grass.seg_string_with_ctx(self.segmentor, input_str, UTF8).decode(encoding).split(" ")
 
     def __del__(self):
         grass.delete_segmentor_ctx(self.segmentor)
 
 
+class WordWithTag(namedtuple("WordWithTag", ["word", "tag"])):
+    def __repr__(self):
+        return "{}/{}".format(self.word, self.tag)
 
+
+class CWordWithTag(ctypes.Structure):
+    _fields_ = [("word", ctypes.c_char_p), ("tag", ctypes.c_char_p)]
+
+
+class TaggingResult(ctypes.Structure):
+    _fields_ = [("words", ctypes.POINTER(CWordWithTag)),
+                ("length", ctypes.c_int)]
+
+
+class POSTagger(object):
+    def __init__(self, feature_file):
+        self.tagger = grass.create_postagger_ctx(feature_file)
+
+    def tag_sentence(self, sentences, encoding="UTF-8"):
+        if isinstance(sentences, (six.string_types, six.binary_type)):
+            sentences = [sentences]
+
+        length = len(sentences)
+        array = (ctypes.c_char_p * length)()
+        for i in range(length):
+            array[i] = sentences[i].encode(encoding)
+
+        result = grass.tag_sentence_with_ctx(self.tagger, array, length, UTF8)
+        return [WordWithTag(word=result.words[i].word.decode(encoding), tag=result.words[i].tag.decode(encoding))
+                for i in range(result.length)]
+
+    def __del__(self):
+        grass.delete_postagger_ctx(self.tagger)
+
+grass.tag_sentence_with_ctx.restype = TaggingResult

@@ -14,7 +14,10 @@
 
 std::vector<Segment::Run*> segmentors(1, nullptr); // use segmentors[0] as default segmentor for backward compatibility
 Segment::Run*& segmentor = segmentors[0]; // reference pointed to segmentors[0]
-POSTagging::Run* postagger = nullptr;
+
+std::vector<POSTagging::Run*> postaggers(1, nullptr);
+POSTagging::Run*& postagger = postaggers[0];
+
 arceager::DepParser * syntax_parser = nullptr;
 arceager::DepParser * psdtr_parser = nullptr;
 titov::DepParser<PackedScoreType> * semantic_parser = nullptr;
@@ -179,17 +182,71 @@ LIBGRASS_API void create_postagger(const std::string & feature_file)
 	}
 }
 
+LIBGRASS_API int create_postagger_ctx(const std::string & feature_file)
+{
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int idx = (int) postaggers.size();
+    POSTagging::Run *newPostagger = new POSTagging::Run();
+    postaggers.push_back(newPostagger);
+    newPostagger->initParser(feature_file, feature_file, "", true);
+    std::cout << "postagger " << idx << " created" << std::endl;
+    return idx;
+}
+
+extern "C" int create_postagger_ctx(char* feature_file) {
+    return create_postagger_ctx(std::string(feature_file));
+}
+
+extern "C" LIBGRASS_API void delete_postagger_ctx(int idx)
+{
+    delete postaggers[idx];
+    postaggers[idx] = nullptr;
+}
+
 LIBGRASS_API void delete_postagger()
 {
-	delete postagger;
-	postagger = nullptr;
+    delete_postagger_ctx(0);
 }
 
 //数据为一句话一行，单词之间空格
+LIBGRASS_API void tag_file_with_ctx(int idx, const std::string & input_file, const std::string & output_file, int encoding) {
+    if (postaggers[idx] != nullptr) {
+        postagger->parse(input_file, output_file, encoding);
+    } else {
+        throw std::runtime_error("null postagger.");
+    }
+}
+
+extern "C" void tag_file_with_ctx(int idx, char* input_file, char* output_file, int encoding) {
+    tag_file_with_ctx(idx, std::string(input_file), std::string(output_file), encoding);
+}
+
 LIBGRASS_API void tag_file(const std::string & input_file, const std::string & output_file, int encoding) {
-	if (postagger != nullptr) {
-		postagger->parse(input_file, output_file, encoding);
-	}
+    tag_file_with_ctx(0, input_file, output_file, encoding);
+}
+
+//词性标注训练数据为一行一个词和对应词性，每个句子之间空一行
+LIBGRASS_API int train_postagger_ctx(const std::string & train_file, const std::string & feature_file, int times, int encoding)
+{
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    POSTagging::Run *newPostagger = new POSTagging::Run();
+    newPostagger->initParser(feature_file, feature_file, "", false);
+    int idx = (int) postaggers.size();
+    postaggers.push_back(newPostagger);
+    
+    for (int i = 0; i < times; i++)
+        postagger->train(train_file);
+
+    return idx;
+}
+
+extern "C" int train_postagger_ctx(char* train_file, char* feature_file, int times, int encoding)
+{
+    return train_postagger_ctx(std::string(train_file), std::string(feature_file), times, encoding);
 }
 
 //词性标注训练数据为一行一个词和对应词性，每个句子之间空一行
@@ -206,11 +263,24 @@ LIBGRASS_API void train_postagger(const std::string & train_file, const std::str
 		postagger->train(train_file);
 }
 
-LIBGRASS_API std::vector<std::pair<std::string, std::string>> tag_sentence(const std::vector<std::string> & input, int encoding) {
-	if (postagger != nullptr) {
+LIBGRASS_API std::vector<std::pair<std::string, std::string>> tag_sentence_with_ctx(int idx, const std::vector<std::string> & input, int encoding) {
+	if (postaggers[idx] != nullptr) {
 		return postagger->parse(input, encoding);
+	} else {
+		throw std::runtime_error("null postagger.");
 	}
-	return{};
+}
+
+LIBGRASS_API std::vector<std::pair<std::string, std::string>> tag_sentence(const std::vector<std::string> & input, int encoding) {
+	return tag_sentence_with_ctx(0, input, encoding);
+}
+
+extern "C" POSTagging::TaggingResult tag_sentence_with_ctx(int idx, char** input, int length, int encoding) {
+	if (postaggers[idx] != nullptr) {
+		return postaggers[idx]->parseToResult(input, length, encoding);
+	} else {
+		throw std::runtime_error("null postagger.");
+	}
 }
 
 LIBGRASS_API void train_syntax_parser(const std::string & input_file, const std::string & feature_file, int round)
