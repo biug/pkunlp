@@ -3,18 +3,21 @@
 #include <stack>
 #include <cstring>
 #include <fstream>
+#include <sstream>
 #include <algorithm>
 #include <unordered_set>
 
 #include "arceager_depparser.h"
+
+std::string toHalfWidth(const std::string & input);
 
 namespace arceager {
 
 	WordPOSTag DepParser::empty_taggedword = WordPOSTag();
 	SetOfDepLabels DepParser::empty_setoflabels = SetOfDepLabels();
 
-	DepParser::DepParser(const std::string & sFeatureInput, const std::string & sFeatureOutput, int nState) :
-		DepParserBase(nState), m_tWords(1), m_tPOSTags(1), m_tLabels(1) {
+	DepParser::DepParser(const std::string &sFeatureInput, const std::string &sFeatureOutput, int nState) :
+			DepParserBase(nState), m_tWords(1), m_tPOSTags(1), m_tLabels(1) {
 
 		m_nSentenceLength = 0;
 
@@ -28,40 +31,40 @@ namespace arceager {
 		delete m_Weight;
 	}
 
-	void DepParser::train(const DependencyTree & correct, const int & round) {
+	void DepParser::train(const DependencyTree &correct, const int &round) {
 		// initialize
 		int idx = 0;
 		int lastTotalErrors = m_nTotalErrors;
 		int lastTrainingRound = m_nTrainingRound;
 		m_nTrainingRound = round;
 		m_nSentenceLength = correct.size();
-		for (const auto & node : correct) {
+		for (const auto &node : correct) {
 			m_lSentence[idx++].refer(m_tWords.lookup(TREENODE_WORD(node)), m_tPOSTags.lookup(TREENODE_POSTAG(node)));
 		}
 
 		// train
 		work(nullptr, correct);
 		if (lastTrainingRound > 0) {
-			nBackSpace("error rate 0.0000 ( " + std::to_string(lastTotalErrors) + " / " + std::to_string(lastTrainingRound) + " ) ");
+			nBackSpace("error rate 0.0000 ( " + std::to_string(lastTotalErrors) + " / " +
+					   std::to_string(lastTrainingRound) + " ) ");
 		}
 		if (m_nTrainingRound > 0) {
-			std::cout << "error rate " << ((double)m_nTotalErrors / (double)m_nTrainingRound);
+			std::cout << "error rate " << ((double) m_nTotalErrors / (double) m_nTrainingRound);
 			std::cout << " ( " << m_nTotalErrors << " / " << m_nTrainingRound << " ) " << std::flush;
 		}
 	}
 
-	void DepParser::parse(const Sentence & sentence, DependencyTree * retval, bool print) {
+	void DepParser::parse(const Sentence &sentence, DependencyTree *retval, bool print) {
 		int idx = 0;
 		++m_nTrainingRound;
 		DependencyTree correct;
 		m_nSentenceLength = sentence.size();
-		for (const auto & token : sentence) {
+		for (const auto &token : sentence) {
 			m_lSentence[idx++].refer(m_tWords.lookup(SENT_WORD(token)), m_tPOSTags.lookup(SENT_POSTAG(token)));
 			correct.push_back(DependencyTreeNode(token, -1, NULL_LABEL));
 		}
 		work(retval, correct);
-		if (print)
-		{
+		if (print) {
 			if (m_nTrainingRound > 1) {
 				nBackSpace("parsing sentence " + std::to_string(m_nTrainingRound - 1));
 			}
@@ -69,7 +72,7 @@ namespace arceager {
 		}
 	}
 
-	void DepParser::goldCheck(const DependencyTree & correct) {
+	void DepParser::goldCheck(const DependencyTree &correct) {
 		StateItem output;
 		while (output.standardMove(correct, m_tLabels, m_AC)) {
 			std::cout << output.lastAction() << std::endl;
@@ -85,7 +88,7 @@ namespace arceager {
 		}
 	}
 
-	void DepParser::work(DependencyTree * retval, const DependencyTree & correct) {
+	void DepParser::work(DependencyTree *retval, const DependencyTree &correct) {
 
 		m_abItems[0].clear();
 		m_abItems[1].clear();
@@ -105,7 +108,7 @@ namespace arceager {
 			if (m_nState == TRAIN) {
 				bool bCorrect = false;
 
-				for (const auto & item : *m_pGenerator) {
+				for (const auto &item : *m_pGenerator) {
 
 					if (*item == m_iCorrect) {
 						bCorrect = true;
@@ -124,14 +127,14 @@ namespace arceager {
 		}
 
 		switch (m_nState) {
-		case ParserState::TRAIN:
-			update();
-			break;
-		case ParserState::PARSE:
-			generate(retval, correct);
-			break;
-		default:
-			break;
+			case ParserState::TRAIN:
+				update();
+				break;
+			case ParserState::PARSE:
+				generate(retval, correct);
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -139,21 +142,19 @@ namespace arceager {
 
 		m_pGenerated->clear();
 
-		for (const auto & iGenerator : *m_pGenerator) {
+		for (const auto &iGenerator : *m_pGenerator) {
 			m_abScores.clear();
 			getActionScores(*iGenerator);
 
-			const tscore & score = iGenerator->getScore();
+			const tscore &score = iGenerator->getScore();
 
 			if (iGenerator->size() == m_nSentenceLength) {
 				if (iGenerator->stackBack() > 0) {
 					reduce(score);
-				}
-				else {
+				} else {
 					popRoot(score);
 				}
-			}
-			else {
+			} else {
 				if (!iGenerator->afterReduce()) {
 					if (iGenerator->size() < m_nSentenceLength - 1 || iGenerator->stackEmpty()) {
 						shift(score);
@@ -165,14 +166,13 @@ namespace arceager {
 					}
 					if (iGenerator->head(iGenerator->stackTop()) != -1) {
 						reduce(score);
-					}
-					else {
+					} else {
 						arcLeft(score);
 					}
 				}
 			}
 
-			for (const auto & saScore : m_abScores) {
+			for (const auto &saScore : m_abScores) {
 				m_iCandidate = *iGenerator;
 				m_iCandidate.setScore(saScore->getScore());
 				m_iCandidate.move(saScore->getAction(), m_AC);
@@ -184,7 +184,7 @@ namespace arceager {
 	void DepParser::update() {
 
 		m_iStatesItem.clear();
-		const StateItem & output = m_pGenerator->bestUnsortItem();
+		const StateItem &output = m_pGenerator->bestUnsortItem();
 
 		if (output != m_iCorrect) {
 			while (m_iStatesItem != output) {
@@ -192,8 +192,7 @@ namespace arceager {
 				int correct_action = m_iStatesItem.followMove(m_iCorrect, m_AC);
 				if (action == correct_action) {
 					m_iStatesItem.move(action, m_AC);
-				}
-				else {
+				} else {
 					break;
 				}
 			}
@@ -203,16 +202,16 @@ namespace arceager {
 		}
 	}
 
-	void DepParser::generate(DependencyTree * retval, const DependencyTree & correct) {
+	void DepParser::generate(DependencyTree *retval, const DependencyTree &correct) {
 		m_pGenerator->bestUnsortItem().generateTree(correct, *retval, m_tLabels);
 	}
 
-	void DepParser::getActionScores(const StateItem & item) {
+	void DepParser::getActionScores(const StateItem &item) {
 		memset(m_mapPackedScore, 0, sizeof(tscore) * MAX_ACTION);
 		getOrUpdateStackScore(item, std::make_pair<int, const int &>(NO_ACTION, 0));
 	}
 
-	void DepParser::updateScoreForState(const StateItem & from, const StateItem & output, const int & amount) {
+	void DepParser::updateScoreForState(const StateItem &from, const StateItem &output, const int &amount) {
 		m_iStateItem = from;
 		std::pair<int, int> m_pairAmount(NO_ACTION, amount);
 		while (m_iStateItem != output) {
@@ -223,88 +222,91 @@ namespace arceager {
 		}
 	}
 
-	void DepParser::getOrUpdateStackScore(const StateItem & item, const ActionScoreIncrement & amount) {
+	void DepParser::getOrUpdateStackScore(const StateItem &item, const ActionScoreIncrement &amount) {
 
-		Weight * cweight = (Weight*)m_Weight;
+		Weight *cweight = (Weight *) m_Weight;
 
-		const int & st_index = item.stackEmpty() ? -1 : item.stackTop();
-		const int & sth_index = st_index == -1 ? -1 : item.head(st_index);
-		const int & sthh_index = sth_index == -1 ? -1 : item.head(sth_index);
-		const int & stld_index = st_index == -1 ? -1 : item.leftDep(st_index);
-		const int & strd_index = st_index == -1 ? -1 : item.rightDep(st_index);
-		const int & stl2d_index = stld_index == -1 ? -1 : item.sibling(stld_index);
-		const int & str2d_index = strd_index == -1 ? -1 : item.sibling(strd_index);
-		const int & n0_index = ((item.size() == m_nSentenceLength) ? -1 : item.size());
-		const int & n0ld_index = n0_index == -1 ? -1 : item.leftDep(n0_index);
-		const int & n0l2d_index = n0ld_index == -1 ? -1 : item.sibling(n0ld_index);
-		const int & s1_index = ((st_index + 1 < m_nSentenceLength) ? st_index + 1 : -1);
-		const int & s2_index = ((st_index + 2 < m_nSentenceLength) ? st_index + 2 : -1);
-		const int & n1_index = ((n0_index + 1 < m_nSentenceLength) ? n0_index + 1 : -1);
-		const int & n2_index = ((n0_index + 2 < m_nSentenceLength) ? n0_index + 2 : -1);
+		const int &st_index = item.stackEmpty() ? -1 : item.stackTop();
+		const int &sth_index = st_index == -1 ? -1 : item.head(st_index);
+		const int &sthh_index = sth_index == -1 ? -1 : item.head(sth_index);
+		const int &stld_index = st_index == -1 ? -1 : item.leftDep(st_index);
+		const int &strd_index = st_index == -1 ? -1 : item.rightDep(st_index);
+		const int &stl2d_index = stld_index == -1 ? -1 : item.sibling(stld_index);
+		const int &str2d_index = strd_index == -1 ? -1 : item.sibling(strd_index);
+		const int &n0_index = ((item.size() == m_nSentenceLength) ? -1 : item.size());
+		const int &n0ld_index = n0_index == -1 ? -1 : item.leftDep(n0_index);
+		const int &n0l2d_index = n0ld_index == -1 ? -1 : item.sibling(n0ld_index);
+		const int &s1_index = ((st_index + 1 < m_nSentenceLength) ? st_index + 1 : -1);
+		const int &s2_index = ((st_index + 2 < m_nSentenceLength) ? st_index + 2 : -1);
+		const int &n1_index = ((n0_index + 1 < m_nSentenceLength) ? n0_index + 1 : -1);
+		const int &n2_index = ((n0_index + 2 < m_nSentenceLength) ? n0_index + 2 : -1);
 
-		const WordPOSTag & st_word_tag = st_index == -1 ? empty_taggedword : m_lSentence[st_index];
-		const WordPOSTag & sth_word_tag = sth_index == -1 ? empty_taggedword : m_lSentence[sth_index];
-		const WordPOSTag & sthh_word_tag = sthh_index == -1 ? empty_taggedword : m_lSentence[sthh_index];
-		const WordPOSTag & stld_word_tag = stld_index == -1 ? empty_taggedword : m_lSentence[stld_index];
-		const WordPOSTag & strd_word_tag = strd_index == -1 ? empty_taggedword : m_lSentence[strd_index];
-		const WordPOSTag & stl2d_word_tag = stl2d_index == -1 ? empty_taggedword : m_lSentence[stl2d_index];
-		const WordPOSTag & str2d_word_tag = str2d_index == -1 ? empty_taggedword : m_lSentence[str2d_index];
-		const WordPOSTag & n0_word_tag = n0_index == -1 ? empty_taggedword : m_lSentence[n0_index];
-		const WordPOSTag & n0ld_word_tag = n0ld_index == -1 ? empty_taggedword : m_lSentence[n0ld_index];
-		const WordPOSTag & n0l2d_word_tag = n0l2d_index == -1 ? empty_taggedword : m_lSentence[n0l2d_index];
-		const WordPOSTag & s1_word_tag = s1_index == -1 ? empty_taggedword : m_lSentence[s1_index];
-		const WordPOSTag & s2_word_tag = s2_index == -1 ? empty_taggedword : m_lSentence[s2_index];
-		const WordPOSTag & n1_word_tag = n1_index == -1 ? empty_taggedword : m_lSentence[n1_index];
-		const WordPOSTag & n2_word_tag = n2_index == -1 ? empty_taggedword : m_lSentence[n2_index];
+		const WordPOSTag &st_word_tag = st_index == -1 ? empty_taggedword : m_lSentence[st_index];
+		const WordPOSTag &sth_word_tag = sth_index == -1 ? empty_taggedword : m_lSentence[sth_index];
+		const WordPOSTag &sthh_word_tag = sthh_index == -1 ? empty_taggedword : m_lSentence[sthh_index];
+		const WordPOSTag &stld_word_tag = stld_index == -1 ? empty_taggedword : m_lSentence[stld_index];
+		const WordPOSTag &strd_word_tag = strd_index == -1 ? empty_taggedword : m_lSentence[strd_index];
+		const WordPOSTag &stl2d_word_tag = stl2d_index == -1 ? empty_taggedword : m_lSentence[stl2d_index];
+		const WordPOSTag &str2d_word_tag = str2d_index == -1 ? empty_taggedword : m_lSentence[str2d_index];
+		const WordPOSTag &n0_word_tag = n0_index == -1 ? empty_taggedword : m_lSentence[n0_index];
+		const WordPOSTag &n0ld_word_tag = n0ld_index == -1 ? empty_taggedword : m_lSentence[n0ld_index];
+		const WordPOSTag &n0l2d_word_tag = n0l2d_index == -1 ? empty_taggedword : m_lSentence[n0l2d_index];
+		const WordPOSTag &s1_word_tag = s1_index == -1 ? empty_taggedword : m_lSentence[s1_index];
+		const WordPOSTag &s2_word_tag = s2_index == -1 ? empty_taggedword : m_lSentence[s2_index];
+		const WordPOSTag &n1_word_tag = n1_index == -1 ? empty_taggedword : m_lSentence[n1_index];
+		const WordPOSTag &n2_word_tag = n2_index == -1 ? empty_taggedword : m_lSentence[n2_index];
 
-		const Word & st_word = st_word_tag.first();
-		const Word & sth_word = sth_word_tag.first();
-		const Word & sthh_word = sthh_word_tag.first();
-		const Word & stld_word = stld_word_tag.first();
-		const Word & strd_word = strd_word_tag.first();
-		const Word & stl2d_word = stl2d_word_tag.first();
-		const Word & str2d_word = str2d_word_tag.first();
-		const Word & n0_word = n0_word_tag.first();
-		const Word & n0ld_word = n0ld_word_tag.first();
-		const Word & n0l2d_word = n0l2d_word_tag.first();
-		const Word & s1_word = s1_word_tag.first();
-		const Word & s2_word = s2_word_tag.first();
-		const Word & n1_word = n1_word_tag.first();
-		const Word & n2_word = n2_word_tag.first();
+		const Word &st_word = st_word_tag.first();
+		const Word &sth_word = sth_word_tag.first();
+		const Word &sthh_word = sthh_word_tag.first();
+		const Word &stld_word = stld_word_tag.first();
+		const Word &strd_word = strd_word_tag.first();
+		const Word &stl2d_word = stl2d_word_tag.first();
+		const Word &str2d_word = str2d_word_tag.first();
+		const Word &n0_word = n0_word_tag.first();
+		const Word &n0ld_word = n0ld_word_tag.first();
+		const Word &n0l2d_word = n0l2d_word_tag.first();
+		const Word &s1_word = s1_word_tag.first();
+		const Word &s2_word = s2_word_tag.first();
+		const Word &n1_word = n1_word_tag.first();
+		const Word &n2_word = n2_word_tag.first();
 
-		const POSTag & st_tag = st_word_tag.second();
-		const POSTag & sth_tag = sth_word_tag.second();
-		const POSTag & sthh_tag = sthh_word_tag.second();
-		const POSTag & stld_tag = stld_word_tag.second();
-		const POSTag & strd_tag = strd_word_tag.second();
-		const POSTag & stl2d_tag = stl2d_word_tag.second();
-		const POSTag & str2d_tag = str2d_word_tag.second();
-		const POSTag & n0_tag = n0_word_tag.second();
-		const POSTag & n0ld_tag = n0ld_word_tag.second();
-		const POSTag & n0l2d_tag = n0l2d_word_tag.second();
-		const POSTag & s1_tag = s1_word_tag.second();
-		const POSTag & s2_tag = s2_word_tag.second();
-		const POSTag & n1_tag = n1_word_tag.second();
-		const POSTag & n2_tag = n2_word_tag.second();
+		const POSTag &st_tag = st_word_tag.second();
+		const POSTag &sth_tag = sth_word_tag.second();
+		const POSTag &sthh_tag = sthh_word_tag.second();
+		const POSTag &stld_tag = stld_word_tag.second();
+		const POSTag &strd_tag = strd_word_tag.second();
+		const POSTag &stl2d_tag = stl2d_word_tag.second();
+		const POSTag &str2d_tag = str2d_word_tag.second();
+		const POSTag &n0_tag = n0_word_tag.second();
+		const POSTag &n0ld_tag = n0ld_word_tag.second();
+		const POSTag &n0l2d_tag = n0l2d_word_tag.second();
+		const POSTag &s1_tag = s1_word_tag.second();
+		const POSTag &s2_tag = s2_word_tag.second();
+		const POSTag &n1_tag = n1_word_tag.second();
+		const POSTag &n2_tag = n2_word_tag.second();
 
-		const int & st_label = st_index == -1 ? 0 : item.label(st_index);
-		const int & sth_label = sth_index == -1 ? 0 : item.label(sth_index);
-		const int & stld_label = stld_index == -1 ? 0 : item.label(stld_index);
-		const int & strd_label = strd_index == -1 ? 0 : item.label(strd_index);
-		const int & stl2d_label = stl2d_index == -1 ? 0 : item.label(stl2d_index);
-		const int & str2d_label = str2d_index == -1 ? 0 : item.label(str2d_index); //PROBLEM!
-		const int & n0ld_label = n0ld_index == -1 ? 0 : item.label(n0ld_index);
-		const int & n0l2d_label = n0l2d_index == -1 ? 0 : item.label(n0l2d_index);
+		const int &st_label = st_index == -1 ? 0 : item.label(st_index);
+		const int &sth_label = sth_index == -1 ? 0 : item.label(sth_index);
+		const int &stld_label = stld_index == -1 ? 0 : item.label(stld_index);
+		const int &strd_label = strd_index == -1 ? 0 : item.label(strd_index);
+		const int &stl2d_label = stl2d_index == -1 ? 0 : item.label(stl2d_index);
+		const int &str2d_label = str2d_index == -1 ? 0 : item.label(str2d_index); //PROBLEM!
+		const int &n0ld_label = n0ld_index == -1 ? 0 : item.label(n0ld_index);
+		const int &n0l2d_label = n0l2d_index == -1 ? 0 : item.label(n0l2d_index);
 
-		const int & st_n0_dist = encodeLinkDistanceOrDirection(st_index, n0_index, false);
+		const int &st_n0_dist = encodeLinkDistanceOrDirection(st_index, n0_index, false);
 
-		const int & st_rarity = st_index == -1 ? 0 : item.rightArity(st_index);
-		const int & st_larity = st_index == -1 ? 0 : item.leftArity(st_index);
-		const int & n0_larity = n0_index == -1 ? 0 : item.leftArity(n0_index);
+		const int &st_rarity = st_index == -1 ? 0 : item.rightArity(st_index);
+		const int &st_larity = st_index == -1 ? 0 : item.leftArity(st_index);
+		const int &n0_larity = n0_index == -1 ? 0 : item.leftArity(n0_index);
 
-		const SetOfDepLabels & st_rtagset = st_index == -1 ? empty_setoflabels : SetOfDepLabels(item.rightSetOfLabels(st_index));
-		const SetOfDepLabels & st_ltagset = st_index == -1 ? empty_setoflabels : SetOfDepLabels(item.leftSetOfLabels(st_index));
-		const SetOfDepLabels & n0_ltagset = n0_index == -1 ? empty_setoflabels : SetOfDepLabels(item.leftSetOfLabels(n0_index));
+		const SetOfDepLabels &st_rtagset =
+				st_index == -1 ? empty_setoflabels : SetOfDepLabels(item.rightSetOfLabels(st_index));
+		const SetOfDepLabels &st_ltagset =
+				st_index == -1 ? empty_setoflabels : SetOfDepLabels(item.leftSetOfLabels(st_index));
+		const SetOfDepLabels &n0_ltagset =
+				n0_index == -1 ? empty_setoflabels : SetOfDepLabels(item.leftSetOfLabels(n0_index));
 
 		if (st_index != -1) {
 			cweight->m_mapSTw.getOrUpdateScore(m_mapPackedScore, st_word, m_nScoreIndex, amount, m_nTrainingRound);
@@ -379,66 +381,90 @@ namespace arceager {
 		}
 
 		if (stl2d_index != -1) {
-			cweight->m_mapSTL2Dw.getOrUpdateScore(m_mapPackedScore, stl2d_word, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTL2Dw.getOrUpdateScore(m_mapPackedScore, stl2d_word, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 			cweight->m_mapSTL2Dt.getOrUpdateScore(m_mapPackedScore, stl2d_tag, m_nScoreIndex, amount, m_nTrainingRound);
-			cweight->m_mapSTL2Di.getOrUpdateScore(m_mapPackedScore, stl2d_label, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTL2Di.getOrUpdateScore(m_mapPackedScore, stl2d_label, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 		}
 
 		if (str2d_index != -1) {
-			cweight->m_mapSTR2Dw.getOrUpdateScore(m_mapPackedScore, str2d_word, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTR2Dw.getOrUpdateScore(m_mapPackedScore, str2d_word, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 			cweight->m_mapSTR2Dt.getOrUpdateScore(m_mapPackedScore, str2d_tag, m_nScoreIndex, amount, m_nTrainingRound);
-			cweight->m_mapSTR2Di.getOrUpdateScore(m_mapPackedScore, str2d_label, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTR2Di.getOrUpdateScore(m_mapPackedScore, str2d_label, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 		}
 
 		if (n0l2d_index != -1) {
-			cweight->m_mapN0L2Dw.getOrUpdateScore(m_mapPackedScore, n0l2d_word, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapN0L2Dw.getOrUpdateScore(m_mapPackedScore, n0l2d_word, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 			cweight->m_mapN0L2Dt.getOrUpdateScore(m_mapPackedScore, n0l2d_tag, m_nScoreIndex, amount, m_nTrainingRound);
-			cweight->m_mapN0L2Di.getOrUpdateScore(m_mapPackedScore, n0l2d_label, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapN0L2Di.getOrUpdateScore(m_mapPackedScore, n0l2d_label, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 		}
 
 		if (st_index != -1) {
 			st_word_tag_n0_word_tag.refer(st_word, n0_word, st_tag, n0_tag);
-			cweight->m_mapSTwtN0wt.getOrUpdateScore(m_mapPackedScore, st_word_tag_n0_word_tag, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTwtN0wt.getOrUpdateScore(m_mapPackedScore, st_word_tag_n0_word_tag, m_nScoreIndex, amount,
+													m_nTrainingRound);
 			word_word_tag.refer(st_word, n0_word, st_tag);
-			cweight->m_mapSTwtN0w.getOrUpdateScore(m_mapPackedScore, word_word_tag, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTwtN0w.getOrUpdateScore(m_mapPackedScore, word_word_tag, m_nScoreIndex, amount,
+												   m_nTrainingRound);
 			word_word_tag.refer(st_word, n0_word, n0_tag);
-			cweight->m_mapSTwN0wt.getOrUpdateScore(m_mapPackedScore, word_word_tag, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTwN0wt.getOrUpdateScore(m_mapPackedScore, word_word_tag, m_nScoreIndex, amount,
+												   m_nTrainingRound);
 			word_tag_tag.refer(st_word, st_tag, n0_tag);
-			cweight->m_mapSTwtN0t.getOrUpdateScore(m_mapPackedScore, word_tag_tag, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTwtN0t.getOrUpdateScore(m_mapPackedScore, word_tag_tag, m_nScoreIndex, amount,
+												   m_nTrainingRound);
 			word_tag_tag.refer(n0_word, st_tag, n0_tag);
-			cweight->m_mapSTtN0wt.getOrUpdateScore(m_mapPackedScore, word_tag_tag, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtN0wt.getOrUpdateScore(m_mapPackedScore, word_tag_tag, m_nScoreIndex, amount,
+												   m_nTrainingRound);
 			st_word_n0_word.refer(st_word, n0_word);
-			cweight->m_mapSTwN0w.getOrUpdateScore(m_mapPackedScore, st_word_n0_word, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTwN0w.getOrUpdateScore(m_mapPackedScore, st_word_n0_word, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 			set_of_2_tags = ENCODE_POSTAG_SET_2(st_tag, n0_tag);
-			cweight->m_mapSTtN0t.getOrUpdateScore(m_mapPackedScore, set_of_2_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtN0t.getOrUpdateScore(m_mapPackedScore, set_of_2_tags, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 		}
 
 		if (st_index != -1 && n0_index != -1) {
 			set_of_2_tags = ENCODE_POSTAG_SET_2(n0_tag, n1_tag);
-			cweight->m_mapN0tN1t.getOrUpdateScore(m_mapPackedScore, set_of_2_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapN0tN1t.getOrUpdateScore(m_mapPackedScore, set_of_2_tags, m_nScoreIndex, amount,
+												  m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(n0_tag, n1_tag, n2_tag);
-			cweight->m_mapN0tN1tN2t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapN0tN1tN2t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+													 m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(st_tag, n0_tag, n1_tag);
-			cweight->m_mapSTtN0tN1t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtN0tN1t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+													 m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(st_tag, n0_tag, n0ld_tag);
-			cweight->m_mapSTtN0tN0LDt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtN0tN0LDt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+													   m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(n0_tag, n0ld_tag, n0l2d_tag);
-			cweight->m_mapN0tN0LDtN0L2Dt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapN0tN0LDtN0L2Dt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+														  m_nTrainingRound);
 		}
 
 		if (st_index != -1) {
 			set_of_3_tags = ENCODE_POSTAG_SET_3(sth_tag, st_tag, n0_tag);
-			cweight->m_mapSTHtSTtN0t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTHtSTtN0t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+													  m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(sthh_tag, sth_tag, st_tag);
-			cweight->m_mapSTHHtSTHtSTt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTHHtSTHtSTt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+														m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(st_tag, stld_tag, n0_tag);
-			cweight->m_mapSTtSTLDtN0t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtSTLDtN0t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+													   m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(st_tag, stld_tag, stl2d_tag);
-			cweight->m_mapSTtSTLDtSTL2Dt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtSTLDtSTL2Dt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+														  m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(st_tag, strd_tag, n0_tag);
-			cweight->m_mapSTtSTRDtN0t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtSTRDtN0t.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+													   m_nTrainingRound);
 			set_of_3_tags = ENCODE_POSTAG_SET_3(st_tag, strd_tag, str2d_tag);
-			cweight->m_mapSTtSTRDtSTR2Dt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtSTRDtSTR2Dt.getOrUpdateScore(m_mapPackedScore, set_of_3_tags, m_nScoreIndex, amount,
+														  m_nTrainingRound);
 		}
 
 		if (st_index != -1 && n0_index != -1) {
@@ -451,9 +477,11 @@ namespace arceager {
 			tag_int.refer(n0_tag, st_n0_dist);
 			cweight->m_mapN0td.getOrUpdateScore(m_mapPackedScore, tag_int, m_nScoreIndex, amount, m_nTrainingRound);
 			word_word_int.refer(st_word, n0_word, st_n0_dist);
-			cweight->m_mapSTwN0wd.getOrUpdateScore(m_mapPackedScore, word_word_int, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTwN0wd.getOrUpdateScore(m_mapPackedScore, word_word_int, m_nScoreIndex, amount,
+												   m_nTrainingRound);
 			tag_tag_int.refer(st_tag, n0_tag, st_n0_dist);
-			cweight->m_mapSTtN0td.getOrUpdateScore(m_mapPackedScore, tag_tag_int, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTtN0td.getOrUpdateScore(m_mapPackedScore, tag_tag_int, m_nScoreIndex, amount,
+												   m_nTrainingRound);
 		}
 
 		if (st_index != -1) {
@@ -476,21 +504,65 @@ namespace arceager {
 
 		if (st_index != -1) {
 			word_tagset.refer(st_word, st_rtagset.bits(0), st_rtagset.bits(1), st_rtagset.bits(2));
-			cweight->m_mapSTwrp.getOrUpdateScore(m_mapPackedScore, word_tagset, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTwrp.getOrUpdateScore(m_mapPackedScore, word_tagset, m_nScoreIndex, amount,
+												 m_nTrainingRound);
 			tag_tagset.refer(st_tag, st_rtagset.bits(0), st_rtagset.bits(1), st_rtagset.bits(2));
 			cweight->m_mapSTtrp.getOrUpdateScore(m_mapPackedScore, tag_tagset, m_nScoreIndex, amount, m_nTrainingRound);
 			word_tagset.refer(st_word, st_ltagset.bits(0), st_ltagset.bits(1), st_ltagset.bits(2));
-			cweight->m_mapSTwlp.getOrUpdateScore(m_mapPackedScore, word_tagset, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapSTwlp.getOrUpdateScore(m_mapPackedScore, word_tagset, m_nScoreIndex, amount,
+												 m_nTrainingRound);
 			tag_tagset.refer(st_tag, st_ltagset.bits(0), st_ltagset.bits(1), st_ltagset.bits(2));
 			cweight->m_mapSTtlp.getOrUpdateScore(m_mapPackedScore, tag_tagset, m_nScoreIndex, amount, m_nTrainingRound);
 		}
 
 		if (n0_index != -1) {
 			word_tagset.refer(n0_word, n0_ltagset.bits(0), n0_ltagset.bits(1), n0_ltagset.bits(2));
-			cweight->m_mapN0wlp.getOrUpdateScore(m_mapPackedScore, word_tagset, m_nScoreIndex, amount, m_nTrainingRound);
+			cweight->m_mapN0wlp.getOrUpdateScore(m_mapPackedScore, word_tagset, m_nScoreIndex, amount,
+												 m_nTrainingRound);
 			tag_tagset.refer(n0_tag, n0_ltagset.bits(0), n0_ltagset.bits(1), n0_ltagset.bits(2));
 			cweight->m_mapN0tlp.getOrUpdateScore(m_mapPackedScore, tag_tagset, m_nScoreIndex, amount, m_nTrainingRound);
 		}
 	}
 
+	void DepParser::ParseStream(std::istream &input, std::ostream &output, int encoding) {
+		Sentence sentence;
+		DependencyTree tree;
+
+		if (input) {
+			while (input >> sentence) {
+				for (auto &&node : sentence) {
+					SENT_WORD(node) = toHalfWidth(SENT_WORD(node));
+					SENT_POSTAG(node) = toHalfWidth(SENT_POSTAG(node));
+				}
+				if (sentence.size() < MAX_SENTENCE_SIZE) {
+					this->parse(sentence, &tree);
+					output << tree;
+					tree.clear();
+				}
+			}
+			output << std::endl;
+		}
+	}
+
+	void DepParser::parseFile(const std::string &input_file,
+				   const std::string &output_file, int encoding) {
+		std::ifstream input(input_file);
+		std::ofstream output(output_file);
+
+		this->ParseStream(input, output, encoding);
+
+		input.close();
+		output.close();
+	}
+
+	void DepParser::parseString(const std::string & input, int encoding) {
+		std::stringstream is(input);
+		std::stringbuf buffer;
+		std::ostream os(&buffer);
+
+		ParseStream(is, os, encoding);
+
+		std::string tmp = buffer.str();
+		tmp.swap(parsingResult); // a trick to shrink memory usage of parsingResult
+	}
 }

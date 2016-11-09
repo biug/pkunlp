@@ -37,6 +37,8 @@ namespace titov {
 		~DepParser();
 
 		void decode() override;
+
+		std::string ParsingResult;
 	};
 
 	template<class RET_TYPE>
@@ -177,6 +179,8 @@ namespace titov {
 		SimOneStackWeight<RET_TYPE, StateItem, ActionConstant> * cweight = (SimOneStackWeight<RET_TYPE, StateItem, ActionConstant>*)(this->m_Weight);
 		cweight->getOrUpdateFeatureScores((GraphDepParserBase<RET_TYPE, StateItem, ActionConstant>*)this, item, amount);
 	}
+
+
 }
 
 #endif

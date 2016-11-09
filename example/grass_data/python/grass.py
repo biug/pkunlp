@@ -27,6 +27,8 @@ def detect_lib_name():
 
 grass = ctypes.cdll.LoadLibrary("./lib/" + detect_lib_name())
 grass.seg_string_with_ctx.restype = ctypes.c_char_p
+grass.syntax_parse_string_with_ctx.restype = ctypes.c_char_p
+grass.semantic_parse_string_with_ctx.restype = ctypes.c_char_p
 UTF8 = 65001
 
 
@@ -46,6 +48,9 @@ class Segmentor(object):
 class WordWithTag(namedtuple("WordWithTag", ["word", "tag"])):
     def __repr__(self):
         return "{}/{}".format(self.word, self.tag)
+
+    def __unicode__(self):
+        return self.__repr__()
 
 
 class CWordWithTag(ctypes.Structure):
@@ -76,5 +81,26 @@ class POSTagger(object):
 
     def __del__(self):
         grass.delete_postagger_ctx(self.tagger)
+
+
+class SyntaxParser(object):
+    def __init__(self, feature_file):
+        self.parser = grass.create_syntax_parser_ctx(feature_file)
+
+    def parse_string(self, sentence, encoding="UTF-8"):
+        if isinstance(sentence, six.text_type):
+            sentence = sentence.encode(encoding)
+        return grass.syntax_parse_string_with_ctx(self.parser, sentence, UTF8).decode(encoding)
+
+
+class SemanticParser(object):
+    def __init__(self, semantic_feature_file, tree_feature_file):
+        self.parser = grass.create_semantic_parser_ctx(semantic_feature_file, tree_feature_file)
+
+    def parse_string(self, sentence, encoding="UTF-8"):
+        if isinstance(sentence, six.text_type):
+            sentence = sentence.encode(encoding)
+        return grass.semantic_parse_string_with_ctx(self.parser, sentence, UTF8).decode(encoding)
+
 
 grass.tag_sentence_with_ctx.restype = TaggingResult

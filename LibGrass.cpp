@@ -18,9 +18,16 @@ Segment::Run*& segmentor = segmentors[0]; // reference pointed to segmentors[0]
 std::vector<POSTagging::Run*> postaggers(1, nullptr);
 POSTagging::Run*& postagger = postaggers[0];
 
-arceager::DepParser * syntax_parser = nullptr;
-arceager::DepParser * psdtr_parser = nullptr;
-titov::DepParser<PackedScoreType> * semantic_parser = nullptr;
+std::vector<arceager::DepParser*> syntaxParsers(1, nullptr);
+arceager::DepParser *& syntax_parser = syntaxParsers[0];
+
+
+std::vector<arceager::DepParser*> psdtrParsers(1, nullptr);
+arceager::DepParser *& psdtr_parser = psdtrParsers[0];
+
+std::vector<titov::DepParser<PackedScoreType>*> semanticParsers(1, nullptr);
+titov::DepParser<PackedScoreType> * semantic_parser = semanticParsers[0];
+std::map<int,std::string> semanticParseResult;
 
 
 std::string toHalfWidth(const std::string & input) {
@@ -288,65 +295,46 @@ LIBGRASS_API void create_syntax_parser(const std::string & feature_file)
 	std::cout << "syntax parser created" << std::endl;
 }
 
+LIBGRASS_API int create_syntax_parser_ctx(const std::string & feature_file)
+{
+    int idx = (int) syntaxParsers.size();
+    arceager::DepParser *newSyntaxParser = new arceager::DepParser(feature_file, feature_file, ParserState::PARSE);
+    syntaxParsers.push_back(newSyntaxParser);
+
+    newSyntaxParser->m_AC.AL_FIRST = arceager::POP_ROOT + 1;
+    newSyntaxParser->m_AC.AL_END = newSyntaxParser->m_AC.AR_FIRST = newSyntaxParser->m_AC.AL_FIRST + newSyntaxParser->m_tLabels.count();
+    newSyntaxParser->m_AC.AR_END = newSyntaxParser->m_AC.AR_FIRST + newSyntaxParser->m_tLabels.count();
+
+    std::cout << "syntax parser " << idx << " created" << std::endl;
+    return idx;
+}
+
+LIBGRASS_API void delete_syntax_parser_ctx(int idx)
+{
+    delete syntaxParsers[idx];
+}
+
 LIBGRASS_API void delete_syntax_parser()
 {
 	if (syntax_parser != nullptr) delete syntax_parser;
 }
 
+LIBGRASS_API void syntax_parse_file_with_ctx(int idx, const std::string & input_file, const std::string & output_file, int encoding) {
+	syntaxParsers[idx]->parseFile(input_file, output_file, encoding);
+}
+
 LIBGRASS_API void syntax_parse_file(const std::string & input_file, const std::string & output_file, int encoding)
 {
-	Sentence sentence;
-	DependencyTree tree;
-
-	std::ifstream input(input_file);
-	std::ofstream output(output_file);
-
-	if (input) {
-		while (input >> sentence) {
-			for (auto && node : sentence)
-			{
-				SENT_WORD(node) = toHalfWidth(SENT_WORD(node));
-				SENT_POSTAG(node) = toHalfWidth(SENT_POSTAG(node));
-			}
-			if (sentence.size() < MAX_SENTENCE_SIZE) {
-				syntax_parser->parse(sentence, &tree);
-				output << tree;
-				tree.clear();
-			}
-		}
-		std::cout << std::endl;
-	}
-	input.close();
-	output.close();
+    syntax_parse_file_with_ctx(0, input_file, output_file, encoding);
 }
 
-LIBGRASS_API std::string syntax_parse_string(const std::string & input, int encoding)
-{
-	std::string output;
-	Sentence sentence;
-	DependencyTree tree;
-
-	std::stringstream ss(input);
-	ss >> sentence;
-	if (sentence.size() < MAX_SENTENCE_SIZE) {
-		for (auto && node : sentence)
-		{
-			SENT_WORD(node) = toHalfWidth(SENT_WORD(node));
-			SENT_POSTAG(node) = toHalfWidth(SENT_POSTAG(node));
-		}
-		syntax_parser->parse(sentence, &tree, false);
-		ss.clear();
-		ss << tree;
-		ss >> output;
-	}
-
-	return output;
+LIBGRASS_API std::string syntax_parse_string_with_ctx(int idx, const std::string & input, int encoding) {
+	syntaxParsers[idx]->parseString(input, encoding);
+	return std::string(syntaxParsers[idx]->parsingResult);
 }
 
-void format_semantic_input(const std::string & input_file, const std::string & output_file)
+void format_semantic_input(std::istream& input, std::ostream& output)
 {
-	std::ifstream input(input_file);
-	std::ofstream output(output_file);
 	Sentence sentence;
 	DependencyGraph graph;
 	while (input >> sentence)
@@ -369,8 +357,6 @@ void format_semantic_input(const std::string & input_file, const std::string & o
 		output << graph;
 		graph.clear();
 	}
-	input.close();
-	output.close();
 }
 
 LIBGRASS_API void train_semantic_parser(const std::string & input_file, const std::string & feature_file, int round)
@@ -396,19 +382,28 @@ LIBGRASS_API void train_semantic_parser(const std::string & input_file, const st
 	}
 }
 
-LIBGRASS_API void create_semantic_parser(const std::string & semantic_feature_file, const std::string & tree_feature_file)
+LIBGRASS_API int create_semantic_parser_ctx(const std::string & semantic_feature_file, const std::string & tree_feature_file)
 {
-	if (semantic_parser != nullptr) delete semantic_parser;
-	semantic_parser = new titov::DepParser<PackedScoreType>("", semantic_feature_file, semantic_feature_file, ParserState::PARSE, true, true, false);
+    int idx = (int) semanticParsers.size();
 
-	if (psdtr_parser != nullptr) delete psdtr_parser;
-	psdtr_parser = new arceager::DepParser(tree_feature_file, tree_feature_file, ParserState::PARSE);
+    titov::DepParser<PackedScoreType> *newSemanticParser =
+            new titov::DepParser<PackedScoreType>("",
+                                                  semantic_feature_file, semantic_feature_file,
+                                                  ParserState::PARSE, true, true, false);
 
-	psdtr_parser->m_AC.AL_FIRST = arceager::POP_ROOT + 1;
-	psdtr_parser->m_AC.AL_END = psdtr_parser->m_AC.AR_FIRST = psdtr_parser->m_AC.AL_FIRST + psdtr_parser->m_tLabels.count();
-	psdtr_parser->m_AC.AR_END = psdtr_parser->m_AC.AR_FIRST + psdtr_parser->m_tLabels.count();
+    arceager::DepParser *newPsdtrParser = new arceager::DepParser(
+            tree_feature_file, tree_feature_file, ParserState::PARSE); 
 
-	std::cout << "sematic parser created" << std::endl;
+	newPsdtrParser->m_AC.AL_FIRST = arceager::POP_ROOT + 1;
+	newPsdtrParser->m_AC.AL_END = newPsdtrParser->m_AC.AR_FIRST = newPsdtrParser->m_AC.AL_FIRST + newPsdtrParser->m_tLabels.count();
+	newPsdtrParser->m_AC.AR_END = newPsdtrParser->m_AC.AR_FIRST + newPsdtrParser->m_tLabels.count();
+
+    semanticParsers.push_back(newSemanticParser);
+    psdtrParsers.push_back(newPsdtrParser);
+
+	std::cout << "sematic parser " << idx << " created" << std::endl;
+
+    return idx;
 }
 
 LIBGRASS_API void delete_semantic_parser()
@@ -417,17 +412,24 @@ LIBGRASS_API void delete_semantic_parser()
 	if (psdtr_parser != nullptr) delete psdtr_parser;
 }
 
-LIBGRASS_API void semantic_parse_file(const std::string & input_file, const std::string & output_file, int encoding)
+extern "C" LIBGRASS_API void delete_semantic_parser_ctx(int idx)
+{
+    delete semanticParsers[idx];
+    delete psdtrParsers[idx];
+}
+
+void semanticParseStream(int idx, std::istream& is, std::ostream& os, int encoding)
 {
 	DependencyGraph sentence;
 	DependencyGraph graph;
 
-	format_semantic_input(input_file, input_file + ".graph");
-	std::ifstream input(input_file + ".graph");
-	std::ofstream output(output_file);
+    std::stringbuf graphBuffer;
+    std::iostream bufIO(&graphBuffer);
 
-	if (input) {
-		while (input >> sentence) {
+    format_semantic_input(is, bufIO);
+
+	if (bufIO) {
+		while (bufIO >> sentence) {
 			Sentence sent;
 			DependencyTree tree;
 			for (auto && node : sentence)
@@ -437,68 +439,34 @@ LIBGRASS_API void semantic_parse_file(const std::string & input_file, const std:
 				sent.push_back(POSTaggedWord(node.m_sWord, node.m_sPOSTag));
 			}
 			if (sentence.size() < MAX_SENTENCE_SIZE) {
-				psdtr_parser->parse(sent, &tree, false);
+				psdtrParsers[idx]->parse(sent, &tree, false);
 				for (int i = 0; i < tree.size(); ++i) {
 					sentence[i].m_nTreeHead = TREENODE_HEAD(tree[i]);
 				}
-				semantic_parser->parse(sentence, &graph);
-				output << graph;
+				semanticParsers[idx]->parse(sentence, &graph);
+				os << graph;
 				graph.clear();
 			}
 		}
-		std::cout << std::endl;
+        os << std::endl;
 	}
-	input.close();
-	output.close();
-	remove((input_file + ".graph").c_str());
 }
 
-LIBGRASS_API std::string semantic_parse_string(const std::string & input, int encoding)
+LIBGRASS_API void semantic_parse_file_with_ctx(int idx, const std::string & input_file,
+                                               const std::string & output_file, int encoding) {
+    std::ifstream input(input_file);
+    std::ofstream output(output_file);
+    semanticParseStream(idx, input, output, encoding);
+}
+
+LIBGRASS_API std::string semantic_parse_string_with_ctx(int idx, const std::string & input, int encoding)
 {
-	DependencyGraph sentence;
-	DependencyGraph graph;
-	Sentence sent;
-	DependencyTree tree;
+    std::stringbuf outputBuffer;
+    std::ostream output(&outputBuffer);
+    std::stringstream is(input);
 
-	std::string output;
-	std::stringstream ss(input);
-	ss >> sent;
-
-	for (auto && node : sent)
-	{
-		SENT_WORD(node) = toHalfWidth(SENT_WORD(node));
-		SENT_POSTAG(node) = toHalfWidth(SENT_POSTAG(node));
-	}
-
-	DependencyGraphNode root;
-	root.m_sWord = "#root#";
-	root.m_sPOSTag = "#ROOT#";
-	root.m_nTreeHead = -1;
-	root.m_sSuperTag = "_";
-	sentence.add(root);
-	for (const auto & token : sent)
-	{
-		DependencyGraphNode node;
-		node.m_sWord = SENT_WORD(token);
-		node.m_sPOSTag = SENT_POSTAG(token);
-		node.m_nTreeHead = 0;
-		node.m_sSuperTag = "_";
-		sentence.add(node);
-	}
-
-	if (sent.size() < MAX_SENTENCE_SIZE) {
-		psdtr_parser->parse(sent, &tree, false);
-		for (int i = 0; i < tree.size(); ++i) {
-			sentence[i].m_nTreeHead = TREENODE_HEAD(tree[i]);
-		}
-		semantic_parser->parse(sentence, &graph);
-		std::cout << std::endl;
-		ss.clear();
-		ss << graph;
-		ss >> output;
-	}
-
-	return output;
+    semanticParseStream(idx, is, output, encoding);
+    return outputBuffer.str();
 }
 
 LIBGRASS_API void sentence_per_line(const std::string & input_file, const std::string & output_file, int encoding) {
@@ -586,4 +554,37 @@ POSTagging::TaggingResult tag_sentence_with_ctx(int idx, char **input, int lengt
         throw std::runtime_error("null postagger.");
     }
 }
+
+int create_syntax_parser_ctx(char* feature_file) {
+	return create_syntax_parser_ctx(std::string(feature_file));
+}
+
+void syntax_parse_file_with_ctx(int idx, char* input_file, char* output_file, int encoding) {
+	return syntax_parse_file_with_ctx(idx, std::string(input_file), std::string(output_file), encoding);
+}
+
+const char* syntax_parse_string_with_ctx(int idx, char* input, int encoding) {
+	syntaxParsers[idx]->parseString(input, encoding);
+	return syntaxParsers[idx]->parsingResult.c_str();
+}
+
+int create_semantic_parser_ctx(char* semantic_feature_file, char* tree_feature_file) {
+	return create_semantic_parser_ctx(std::string(semantic_feature_file), std::string(tree_feature_file));
+}
+
+void semantic_parse_file_with_ctx(int idx, char* input_file,
+								  char* output_file, int encoding) {
+	semantic_parse_file_with_ctx(idx, std::string(input_file),
+								 std::string(output_file), encoding);
+}
+
+char* semantic_parse_string_with_ctx(int idx, char* input, int encoding) {
+	std::string s = semantic_parse_string_with_ctx(idx, std::string(input), encoding);
+	auto res = semanticParseResult.insert(std::pair<int,std::string>(idx, s));
+	if ( ! res.second ) {
+		(res.first)->second.swap(s);
+	}
+	return (char *) (res.first)->second.c_str();
+}
+
 };

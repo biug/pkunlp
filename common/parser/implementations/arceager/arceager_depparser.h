@@ -70,6 +70,8 @@ namespace arceager {
 		void shift(const tscore & score);
 		void popRoot(const tscore & score);
 
+		void ParseStream(std::istream &input, std::ostream &output, int encoding);
+
 	public:
 		DepParser(const std::string & sFeatureInput, const std::string & sFeatureOut, int nState);
 		~DepParser();
@@ -85,6 +87,12 @@ namespace arceager {
 		DPOSTag m_tPOSTags;
 		DLabel m_tLabels;
 		ArceagerConstant m_AC;
+
+		std::string parsingResult;
+
+		void parseFile(const std::string &input_file, const std::string &output_file, int encoding);
+
+		void parseString(const std::string &input, int encoding);
 	};
 
 	inline void DepParser::reduce(const tscore & score) {
