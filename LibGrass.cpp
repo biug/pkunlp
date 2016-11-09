@@ -555,8 +555,7 @@ LIBGRASS_API void train_segmentor_ctx(const char *train_file, const char *featur
 
 LIBGRASS_API const char *seg_string_with_ctx(int idx, const char *input, int encoding) {
     if (segmentors[idx] != nullptr) {
-        std::vector <std::string> result;
-        segmentors[idx]->parseInput(input, encoding);
+        segmentors[idx]->parseInput(input, encoding, (char) 9);
         return (segmentors[idx]->tmpParsingResult).c_str();
     } else {
         throw std::runtime_error("null segmentor");

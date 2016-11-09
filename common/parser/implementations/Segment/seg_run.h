@@ -17,6 +17,8 @@ namespace Segment {
 		std::string parse(const std::string & sInput, int e = CP_UTF8);
 		std::vector<std::pair<std::string, std::string>> parse(const std::vector<std::string> & vecInput, int e = CP_UTF8) const;
 
+        void parseInput(const std::string &sInput, int e, char sep);
+
 		void parseInput(const std::string &sInput, int e);
 	};
 }

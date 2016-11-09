@@ -89,6 +89,10 @@ namespace Segment {
 	}
 
 	void Run::parseInput(const std::string & sInput, int e) {
+		parseInput(sInput, e, ' ');
+	}
+
+	void Run::parseInput(const std::string & sInput, int e, char sep) {
 		std::string& result = tmpParsingResult;
 		tmpParsingResult = "";
 		if (sInput.empty()) return ;
@@ -102,13 +106,13 @@ namespace Segment {
 			tagsentence.clear();
 			m_pSegmentor->parse(line.substr(0, pos + period.size()), &tagsentence);
 			line = line.substr(pos + period.size());
-			for (int i = 0, n = tagsentence.size(); i < n; ++i) result += tagsentence[i] + ' ';
+			for (int i = 0, n = tagsentence.size(); i < n; ++i) result += tagsentence[i] + sep;
 		}
 
 		tagsentence.clear();
 		m_pSegmentor->parse(line, &tagsentence);
 		result += tagsentence[0];
-		for (int i = 1, n = tagsentence.size(); i < n; ++i) result += ' ' + tagsentence[i];
+		for (int i = 1, n = tagsentence.size(); i < n; ++i) result += sep + tagsentence[i];
 
 	}
 

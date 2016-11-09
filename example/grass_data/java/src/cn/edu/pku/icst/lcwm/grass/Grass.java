@@ -1,9 +1,6 @@
 package cn.edu.pku.icst.lcwm.grass;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.StringArray;
-import com.sun.jna.Structure;
+import com.sun.jna.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +17,7 @@ public interface Grass extends Library {
     void delete_segmentor_ctx(int idx);
     void train_segmentor_ctx(String train_file, String feature_file, String dict_file, int times, int encoding);
     void seg_file_with_ctx(int idx, String input_file, String output_file, int encoding);
-    String seg_string_with_ctx(int idx, String input, int encoding);
+    Pointer seg_string_with_ctx(int idx, String input, int encoding);
 
     int create_postagger_ctx(String featureFile);
     TaggingResult.ByValue tag_sentence_with_ctx(int idx, StringArray array, int length, int encoding);

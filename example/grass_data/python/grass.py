@@ -37,7 +37,7 @@ class Segmentor(object):
     def seg_string(self, input_str, encoding="UTF-8"):
         if isinstance(input_str, six.text_type):
             input_str = input_str.encode(encoding)
-        return grass.seg_string_with_ctx(self.segmentor, input_str, UTF8).decode(encoding).split(" ")
+        return [i.decode(encoding) for i in grass.seg_string_with_ctx(self.segmentor, input_str, UTF8).split(b"\x09")]
 
     def __del__(self):
         grass.delete_segmentor_ctx(self.segmentor)
