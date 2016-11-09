@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\common">
+      <UniqueIdentifier>{13d83d9c-bbb0-4823-8148-909781d7eeb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\parser">
+      <UniqueIdentifier>{4034c1c6-aa44-44f6-bbd0-bc78f33a5337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\parser\implementations">
+      <UniqueIdentifier>{7cfe19f8-527d-4e52-9fc2-d9646ccb38e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\parser\implementations\arceager">
+      <UniqueIdentifier>{2a783aeb-0d5e-4317-9d49-1f2a370b8712}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\token">
+      <UniqueIdentifier>{f346b104-5286-4489-a930-f6535452955a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common">
+      <UniqueIdentifier>{e7427378-6f12-4c21-a1f8-3c29115759cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\parser">
+      <UniqueIdentifier>{0f67ca96-2198-457c-a92d-eacf015e5e89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\parser\implementations">
+      <UniqueIdentifier>{c8f98b74-9af3-44a6-8161-886db89e0577}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\parser\implementations\arceager">
+      <UniqueIdentifier>{439af041-49ff-4361-8122-baf1f148a326}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\parser\token">
+      <UniqueIdentifier>{aa219693-c047-4b1d-b337-fb49cc2a05bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\parser\implementations\graph_transition">
+      <UniqueIdentifier>{39f123f0-07f3-4cfe-8587-5e7c7e22126f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\parser\implementations\graph_transition\titov">
+      <UniqueIdentifier>{165a1a75-6abc-47b1-86b8-dcc1f93e79fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include">
+      <UniqueIdentifier>{ddf684f3-2e94-4d18-80a9-363a9df341d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\learning">
+      <UniqueIdentifier>{d92fdfc2-b68a-4c0a-add9-6b3f9f6118f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\learning\tree">
+      <UniqueIdentifier>{adcfacb3-fa15-4f56-be3b-286edd74849c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\learning\perceptron">
+      <UniqueIdentifier>{914e463b-6618-4525-818c-c820e8f86c53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\parser\implementations\graph_transition">
+      <UniqueIdentifier>{675dc11d-0758-40f6-bc64-9230a2a8da0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\parser\implementations\graph_transition\titov">
+      <UniqueIdentifier>{edc156de-982f-44b0-9008-8560686e67ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\include">
+      <UniqueIdentifier>{b5244fc1-867e-4022-8055-7b92c100ae48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\include\learning">
+      <UniqueIdentifier>{6a75350f-ff34-490b-849c-c34b1588c4b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\include\learning\tree">
+      <UniqueIdentifier>{601ea0f9-3442-437e-904d-0520de330522}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\parser\implementations\POSTagging">
+      <UniqueIdentifier>{c78ab479-22dd-4047-b122-c1d284d439f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\parser\implementations\Segment">
+      <UniqueIdentifier>{27ce81ed-39b3-4a41-ae6f-087e97a7f0aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\parser\implementations\POSTagging">
+      <UniqueIdentifier>{b552c213-ab87-476d-8d70-61f59aa2fa2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\parser\implementations\Segment">
+      <UniqueIdentifier>{e89dfd93-85b1-496e-aedd-2080e31b393c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\agenda.h">
+      <Filter>Header Files\common\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\depparser_base.h">
+      <Filter>Header Files\common\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\macros_base.h">
+      <Filter>Header Files\common\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\run_base.h">
+      <Filter>Header Files\common\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\weight_base.h">
+      <Filter>Header Files\common\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\arceager\arceager_depparser.h">
+      <Filter>Header Files\common\parser\implementations\arceager</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\arceager\arceager_macros.h">
+      <Filter>Header Files\common\parser\implementations\arceager</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\arceager\arceager_run.h">
+      <Filter>Header Files\common\parser\implementations\arceager</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\arceager\arceager_state.h">
+      <Filter>Header Files\common\parser\implementations\arceager</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\arceager\arceager_weight.h">
+      <Filter>Header Files\common\parser\implementations\arceager</Filter>
+    </ClInclude>
+    <ClInclude Include="common\token\tagset.h">
+      <Filter>Header Files\common\token</Filter>
+    </ClInclude>
+    <ClInclude Include="common\token\token.h">
+      <Filter>Header Files\common\token</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGrass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\graph_transition_depparser.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\graph_transition_macros.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\graph_transition_run.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\graph_transition_state.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\graph_transition_weight.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\sim_one_stack_weight.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\titov\titov_depparser.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition\titov</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\titov\titov_macros.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition\titov</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\titov\titov_run.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition\titov</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\graph_transition\titov\titov_state.h">
+      <Filter>Header Files\common\parser\implementations\graph_transition\titov</Filter>
+    </ClInclude>
+    <ClInclude Include="include\learning\tree\lca.h">
+      <Filter>Header Files\include\learning\tree</Filter>
+    </ClInclude>
+    <ClInclude Include="include\learning\perceptron\packed_score.h">
+      <Filter>Header Files\include\learning\perceptron</Filter>
+    </ClInclude>
+    <ClInclude Include="include\learning\perceptron\score.h">
+      <Filter>Header Files\include\learning\perceptron</Filter>
+    </ClInclude>
+    <ClInclude Include="include\learning\perceptron\score_array.h">
+      <Filter>Header Files\include\learning\perceptron</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dependency_primitive.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ngram.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="common\token\pos.h">
+      <Filter>Header Files\common\token</Filter>
+    </ClInclude>
+    <ClInclude Include="common\token\word.h">
+      <Filter>Header Files\common\token</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\Segment\seg_depparser.h">
+      <Filter>Header Files\common\parser\implementations\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\Segment\seg_macros.h">
+      <Filter>Header Files\common\parser\implementations\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\Segment\seg_run.h">
+      <Filter>Header Files\common\parser\implementations\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\Segment\seg_weight.h">
+      <Filter>Header Files\common\parser\implementations\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\POSTagging\postag_depparser.h">
+      <Filter>Header Files\common\parser\implementations\POSTagging</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\POSTagging\postag_macros.h">
+      <Filter>Header Files\common\parser\implementations\POSTagging</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\POSTagging\postag_run.h">
+      <Filter>Header Files\common\parser\implementations\POSTagging</Filter>
+    </ClInclude>
+    <ClInclude Include="common\parser\implementations\POSTagging\postag_weight.h">
+      <Filter>Header Files\common\parser\implementations\POSTagging</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGrass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\macros_base.cpp">
+      <Filter>Source Files\common\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\arceager\arceager_depparser.cpp">
+      <Filter>Source Files\common\parser\implementations\arceager</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\arceager\arceager_macros.cpp">
+      <Filter>Source Files\common\parser\implementations\arceager</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\arceager\arceager_run.cpp">
+      <Filter>Source Files\common\parser\implementations\arceager</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\arceager\arceager_state.cpp">
+      <Filter>Source Files\common\parser\implementations\arceager</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\arceager\arceager_weight.cpp">
+      <Filter>Source Files\common\parser\implementations\arceager</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\graph_transition\graph_transition_macros.cpp">
+      <Filter>Source Files\common\parser\implementations\graph_transition</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\graph_transition\graph_transition_state.cpp">
+      <Filter>Source Files\common\parser\implementations\graph_transition</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\graph_transition\titov\titov_macros.cpp">
+      <Filter>Source Files\common\parser\implementations\graph_transition\titov</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\graph_transition\titov\titov_state.cpp">
+      <Filter>Source Files\common\parser\implementations\graph_transition\titov</Filter>
+    </ClCompile>
+    <ClCompile Include="include\learning\tree\lca.cpp">
+      <Filter>Source Files\include\learning\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="include\dependency_primitive.cpp">
+      <Filter>Source Files\include</Filter>
+    </ClCompile>
+    <ClCompile Include="common\token\pos.cpp">
+      <Filter>Source Files\common\parser\token</Filter>
+    </ClCompile>
+    <ClCompile Include="common\token\word.cpp">
+      <Filter>Source Files\common\parser\token</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\Segment\seg_depparser.cpp">
+      <Filter>Source Files\common\parser\implementations\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\Segment\seg_run.cpp">
+      <Filter>Source Files\common\parser\implementations\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\Segment\seg_weight.cpp">
+      <Filter>Source Files\common\parser\implementations\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\Segment\seg_macros.cpp">
+      <Filter>Source Files\common\parser\implementations\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\POSTagging\postag_depparser.cpp">
+      <Filter>Source Files\common\parser\implementations\POSTagging</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\POSTagging\postag_run.cpp">
+      <Filter>Source Files\common\parser\implementations\POSTagging</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\POSTagging\postag_weight.cpp">
+      <Filter>Source Files\common\parser\implementations\POSTagging</Filter>
+    </ClCompile>
+    <ClCompile Include="common\parser\implementations\POSTagging\postag_macros.cpp">
+      <Filter>Source Files\common\parser\implementations\POSTagging</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
