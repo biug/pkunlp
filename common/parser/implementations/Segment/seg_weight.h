@@ -3,8 +3,8 @@
 
 #include <unordered_map>
 #include "seg_macros.h"
-#include "common\token\word.h"
-#include "common\token\pos.h"
+#include "common/token/word.h"
+#include "common/token/pos.h"
 #include "common/parser/weight_base.h"
 #include "include/learning/perceptron/packed_score.h"
 

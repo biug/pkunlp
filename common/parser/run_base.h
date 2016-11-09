@@ -1,11 +1,14 @@
 #ifndef _RUN_H
 #define _RUN_H
 
-#include "stdafx.h"
-
 #include <string>
-
 #include "depparser_base.h"
+
+#ifndef _WIN32
+	#define CP_UTF8 65001
+	#define CP_ACP 0
+	typedef wchar_t WCHAR;
+#endif
 
 class RunBase {
 public:

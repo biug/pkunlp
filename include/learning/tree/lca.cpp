@@ -60,7 +60,7 @@ void LCA::loadTree(std::vector<int> & heads) {
 	while (!children[root].empty()) {
 		Eular[pivot] = seek;
 		Depth[pivot] = depth;
-		Index[seek] = min(Index[seek], pivot);
+		Index[seek] = std::min(Index[seek], pivot);
 		++pivot;
 		if (children[seek].empty()) {
 			seek = heads[seek];
@@ -227,8 +227,8 @@ void LCA::loadPath(DependencyTree & tree) {
 				sj = heads[sj];
 				++right_dep;
 			}
-			POSPath[i - 1].push_back(min(left_dep, right_dep) <= 2 ? lp + rp : LCA::NONE);
-			FPOSPath[i - 1].push_back(min(left_dep, right_dep) <= 2 ? lfp + rfp : LCA::NONE);
+			POSPath[i - 1].push_back(std::min(left_dep, right_dep) <= 2 ? lp + rp : LCA::NONE);
+			FPOSPath[i - 1].push_back(std::min(left_dep, right_dep) <= 2 ? lfp + rfp : LCA::NONE);
 		}
 	}
 }

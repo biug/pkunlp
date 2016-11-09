@@ -1,0 +1,5 @@
+feature/
+test.*
+LibGrassTest/.idea/
+LibGrassTest/build/
+LibGrassTest/lib/libgrass.so

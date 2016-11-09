@@ -60,7 +60,7 @@ namespace Segment {
 		std::ifstream input(sInputFile);
 		std::ofstream output(sOutputFile);
 
-		static std::string period = GBK2UTF8("¡£");
+		static std::string period = "ã€‚";
 
 		if (input) {
 			std::string line;
@@ -88,28 +88,37 @@ namespace Segment {
 		output.close();
 	}
 
-	std::string Run::parse(const std::string & sInput, int e) const {
-		std::string result = "";
-		if (sInput.empty()) return "";
+	void Run::parseInput(const std::string & sInput, int e) {
+		parseInput(sInput, e, ' ');
+	}
+
+	void Run::parseInput(const std::string & sInput, int e, char sep) {
+		std::string& result = tmpParsingResult;
+		tmpParsingResult = "";
+		if (sInput.empty()) return ;
 		TagSentence tagsentence;
 		std::string line = sInput;
 		if (e == CP_ACP) line = GBK2UTF8(line);
 		int pos = -1;
-		static std::string period = GBK2UTF8("¡£");
+		static std::string period = "ã€‚";
 
 		while ((pos = line.find(period)) != std::string::npos && pos != line.size() - period.size()) {
 			tagsentence.clear();
 			m_pSegmentor->parse(line.substr(0, pos + period.size()), &tagsentence);
 			line = line.substr(pos + period.size());
-			for (int i = 0, n = tagsentence.size(); i < n; ++i) result += tagsentence[i] + ' ';
+			for (int i = 0, n = tagsentence.size(); i < n; ++i) result += tagsentence[i] + sep;
 		}
 
 		tagsentence.clear();
 		m_pSegmentor->parse(line, &tagsentence);
 		result += tagsentence[0];
-		for (int i = 1, n = tagsentence.size(); i < n; ++i) result += ' ' + tagsentence[i];
+		for (int i = 1, n = tagsentence.size(); i < n; ++i) result += sep + tagsentence[i];
 
-		return result;
+	}
+
+	std::string Run::parse(const std::string & sInput, int e) {
+		parseInput(sInput, e);
+		return std::string(tmpParsingResult);
 	}
 
 	std::vector<std::pair<std::string, std::string>> Run::parse(const std::vector<std::string> & vecInput, int) const {

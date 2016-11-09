@@ -8,6 +8,12 @@
 #include <algorithm>
 
 #include "macros_base.h"
+#ifdef WIN32
+	#include <windows.h>
+#else
+	#include "common/iconv-wrapper/iconv.hpp"
+#endif
+
 
 int encodeLinkDistance(const int & st, const int & n0) {
 	int diff = n0 - st;
@@ -200,6 +206,7 @@ std::ostream & operator<<(std::ostream & output, const DependencyTaggedTree & tr
 	return output;
 }
 
+#ifdef _WIN32
 std::string GBK2UTF8(const std::string & sGBK) {
 	std::string sUTF8 = "";
 	WCHAR * str1;
@@ -229,6 +236,21 @@ std::string UTF82GBK(const std::string & sUTF8) {
 	delete[]str2;
 	return sGBK;
 }
+#else
+std::string GBK2UTF8(const std::string & sGBK) {
+	std::string ret;
+	iconvpp::converter reconv("GBK", "UTF-8");
+	reconv.convert(sGBK, ret);
+	return ret;
+}
+
+std::string UTF82GBK(const std::string & sUTF8) {
+	std::string ret;
+	iconvpp::converter reconv("UTF-8", "GBK");
+	reconv.convert(sUTF8, ret);
+	return ret;
+}
+#endif
 
 void nBackSpace(const std::string & str) {
 	for (int i = 0; i < str.size(); ++i) {
