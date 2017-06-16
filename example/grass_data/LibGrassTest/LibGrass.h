@@ -56,24 +56,35 @@ LIBGRASS_API std::vector<std::pair<std::string, std::string>> tag_sentence(const
 // syntax tree
 LIBGRASS_API void train_syntax_parser(const std::string & input_file, const std::string & feature_file, int round);
 
+
 LIBGRASS_API void create_syntax_parser(const std::string & feature_file);
+LIBGRASS_API int create_syntax_parser_ctx(const std::string & feature_file);
 
 LIBGRASS_API void delete_syntax_parser();
+LIBGRASS_API void delete_syntax_parser_ctx(int idx);
 
 LIBGRASS_API void syntax_parse_file(const std::string & input_file, const std::string & output_file, int encoding = CP_UTF8);
+LIBGRASS_API void syntax_parse_file_with_ctx(int idx, const std::string & input_file, const std::string & output_file, int encoding = CP_UTF8);
 
 LIBGRASS_API std::string syntax_parse_string(const std::string & input, int encoding = CP_UTF8);
+LIBGRASS_API std::string syntax_parse_string_with_ctx(int idx, const std::string & input, int encoding = CP_UTF8);
 
 // semantic graph
 LIBGRASS_API void train_semantic_parser(const std::string & input_file, const std::string & feature_file, int round);
 
 LIBGRASS_API void create_semantic_parser(const std::string & semantic_feature_file, const std::string & tree_feature_file);
+LIBGRASS_API int create_semantic_parser_ctx(const std::string & semantic_feature_file, const std::string & tree_feature_file);
 
 LIBGRASS_API void delete_semantic_parser();
+extern "C" LIBGRASS_API void delete_semantic_parser_ctx(int idx);
+
 
 LIBGRASS_API void semantic_parse_file(const std::string & input_file, const std::string & output_file, int encoding = CP_UTF8);
+LIBGRASS_API void semantic_parse_file_with_ctx(int idx, const std::string & input_file,
+                                               const std::string & output_file, int encoding = CP_UTF8);
 
 LIBGRASS_API std::string semantic_parse_string(const std::string & input, int encoding = CP_UTF8);
+LIBGRASS_API std::string semantic_parse_string_with_ctx(int idx, const std::string & input, int encoding = CP_UTF8);
 
 // helper
 LIBGRASS_API void sentence_per_line(const std::string & input_file, const std::string & output_file, int encoding = CP_UTF8);

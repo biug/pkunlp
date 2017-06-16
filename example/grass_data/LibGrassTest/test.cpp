@@ -21,22 +21,22 @@ int main()
 	sentence_per_line("../test.pos", "../test.sents");
 
 	// 创建句法分析器
-	create_syntax_parser("../feature/syntax.feat");
+	int syntax_parser = create_syntax_parser_ctx("../feature/syntax.feat");
 	// 对句子进行句法分析
 	// 输出文件是句法树，共四列
 	// 第一、二列是词和词性
 	// 第三列是词在句法树中的父亲的位置索引，-1表示根节点
 	// 第四列是词指向父节点的边的label
-	syntax_parse_file("../test.sents", "../test.syn");
+	syntax_parse_file_with_ctx(syntax_parser, "../test.sents", "../test.syn");
 	// 释放句法分析器
-	delete_syntax_parser();
+	delete_syntax_parser_ctx(syntax_parser);
 
 	// 创建语义分析器
 	// 语义分析的格式符合conll08
-	create_semantic_parser("../feature/semantic.feat", "../feature/pseudotree.feat");
+	int semantic_parser = create_semantic_parser_ctx("../feature/semantic.feat", "../feature/pseudotree.feat");
 	// 对句子进行语义分析
 	// 输出文件是语意图
-	semantic_parse_file("../test.sents", "../test.sem");
+	semantic_parse_file_with_ctx(semantic_parser, "../test.sents", "../test.sem");
 	// 释放语义分析器
-	delete_semantic_parser();
+	delete_semantic_parser_ctx(semantic_parser);
 }
