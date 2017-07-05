@@ -2,6 +2,8 @@
 ## encoding: utf-8
 from __future__ import unicode_literals, print_function
 import ctypes
+import os
+
 import six
 import sys
 import platform
@@ -25,7 +27,8 @@ def detect_lib_name():
     return "libgrass-{}{}.{}".format(system, bit, ext)
 
 
-grass = ctypes.cdll.LoadLibrary("./lib/" + detect_lib_name())
+lib_file = os.path.join(os.path.dirname(__file__), "lib", detect_lib_name())
+grass = ctypes.cdll.LoadLibrary(lib_file)
 grass.seg_string_with_ctx.restype = ctypes.c_char_p
 grass.syntax_parse_string_with_ctx.restype = ctypes.c_char_p
 grass.semantic_parse_string_with_ctx.restype = ctypes.c_char_p
