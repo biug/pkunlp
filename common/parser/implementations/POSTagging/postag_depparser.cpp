@@ -136,7 +136,7 @@ namespace POSTagging {
 	void DepParser::toMyString_UTF8(std::string s, int pos)
 	{
 		wordsentence[pos].mystring.clear();
-		wordsentence[pos].code = m_Weight->map_words.code(s);
+		wordsentence[pos].code = m_Weight->map_words.getTokenizer().find(s);
 
 		int i;
 		unsigned int num = 0;

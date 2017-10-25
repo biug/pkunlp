@@ -96,7 +96,6 @@ namespace POSTagging {
 				correct.clear();
 				while(ss >> word) {
 					wordsentence.push_back(word);
-					correct.push_back(word);
 				}
 				if (wordsentence.size() < MAX_SEG_SIZE) {
 					m_pPOSTagger->parse(wordsentence, correct ,&tagsentence);
@@ -157,11 +156,9 @@ namespace POSTagging {
 			std::string word(vecInput[i]);
 			if (e == CP_ACP) {
 				wordsentence.push_back(GBK2UTF8(word));
-				correct.push_back(GBK2UTF8(word));
 			}
 			else {
 				wordsentence.push_back(word);
-				correct.push_back(word);
 			}
 			if (wordsentence.back() == period || i == length - 1) {
                 if (wordsentence.size() >= MAX_SEG_SIZE) {
