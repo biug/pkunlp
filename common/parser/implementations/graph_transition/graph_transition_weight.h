@@ -4,9 +4,9 @@
 #include "stdafx.h"
 
 #include "graph_transition_macros.h"
-#include "common/parser/weight_base.h"
+#include "common/parser/old_weight_base.h"
 
-class GraphWeightBase : public WeightBase {
+class GraphWeightBase : public WeightBaseOld {
 protected:
 
 	DWord * m_pWords;
@@ -21,7 +21,7 @@ public:
 	GraphWeightBase(const std::string & sRead, const std::string & sRecord,
 			DWord * pWords, DPOSTag * pPOSTags, DLabel * pLables, DSuperTag * pSuperTags,
 			SuperTagCandidates * wordsCandidates, SuperTagCandidates * postagsCandidates) :
-		WeightBase(sRead, sRecord), m_pWords(pWords), m_pPOSTags(pPOSTags), m_pLabels(pLables), m_pSuperTags(pSuperTags),
+		WeightBaseOld(sRead, sRecord), m_pWords(pWords), m_pPOSTags(pPOSTags), m_pLabels(pLables), m_pSuperTags(pSuperTags),
 		m_pSuperTagCandidatesOfWords(wordsCandidates), m_pSuperTagCandidatesOfPOSTags(postagsCandidates) {}
 	virtual ~GraphWeightBase() {};
 };

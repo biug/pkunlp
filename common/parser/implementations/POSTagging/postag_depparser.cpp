@@ -10,8 +10,8 @@
 #include <ctime>
 
 #include "postag_depparser.h"
-#include "common/token/word.h"
-#include "common/token/pos.h"
+#include "common/oldtoken/word.h"
+#include "common/oldtoken/pos.h"
 #include "postag_macros.h"
 
 #define INF 0x3fffffff

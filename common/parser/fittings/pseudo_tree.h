@@ -53,7 +53,7 @@ protected:
 	};
 
 	int arcScore(const int & head, const int & pred, const CoNLL08DepGraph & graph, const CoNLL08DepGraph & cGraph, const std::vector<CoNLL08DepGraph> & pGraphs, const std::vector<CoNLL08DepGraph> & nGraphs);
-	ttoken arcLabel(const int & head, const int & pred, const CoNLL08DepGraph & graph);
+	ttokenold arcLabel(const int & head, const int & pred, const CoNLL08DepGraph & graph);
 
 	std::vector<tEisnerArc> decodeEisnerArcs(const CoNLL08DepGraph & graph, const CoNLL08DepGraph & cGraph, const std::vector<CoNLL08DepGraph> & pGraphs, const std::vector<CoNLL08DepGraph> & nGraphs);
 

@@ -11,11 +11,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 
+
 /**
  * Created by draplater on 16-10-23.
  */
 public interface Grass extends Library {
-    Grass INSTANCE = (Grass) GrassLibraryLoader.loadLibraryInJAR(Grass.class);
+    Grass INSTANCE = (Grass) LibraryLoader.loadLibraryInJAR(Grass.class, "libgrass");
     int UTF8 = 65001;
 
     int create_segmentor_ctx(String featureFile, String dictFile);
@@ -58,55 +59,6 @@ public interface Grass extends Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList("words", "length");
-        }
-    }
-}
-
-class GrassLibraryLoader {
-    static String getLibraryPath() {
-        String osName = System.getProperty("os.name").toLowerCase();
-        String osArch = System.getProperty("os.arch").toLowerCase();
-        if(osName.contains("win")) {
-            osName = "win";
-        } else if(osName.contains("linux")) {
-            osName = "linux";
-        } else {
-            throw new IllegalStateException(
-                    String.format("Your system %s-%s is unsupported.", osName, osArch));
-        }
-
-        if(osArch.contains("64")) {
-            osArch = "64";
-        } else if(osArch.contains("86") || osArch.contains("32")) {
-            osArch = "32";
-        } else {
-            throw new IllegalStateException(
-                    String.format("Your system %s-%s is unsupported.", osName, osArch));
-        }
-
-        return "/libs/libgrass-" + osName + osArch + ".so";
-    }
-
-    public static <T> T loadLibraryInJAR(Class<T> interfaceClass) {
-        try {
-            File tmp = File.createTempFile("libgrass-library", ".tmp");
-            InputStream libraryAsStream = GrassLibraryLoader.class.getResourceAsStream(getLibraryPath());
-            if(libraryAsStream == null) {
-                System.err.println("Can not find libgrass!");
-                System.exit(1);
-                return null;
-            }
-            Files.copy(libraryAsStream,
-                    Paths.get(tmp.getAbsolutePath()),
-                    StandardCopyOption.REPLACE_EXISTING);
-            T ret = Native.loadLibrary(tmp.getAbsolutePath(), interfaceClass);
-            tmp.deleteOnExit();
-            return ret;
-        } catch (IOException e) {
-            System.err.println("Can not create temp file!");
-            e.printStackTrace();
-            System.exit(1);
-            return null;
         }
     }
 }

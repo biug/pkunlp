@@ -66,13 +66,13 @@ set(SOURCE_FILES
     common/parser/macros_base.cpp
     common/parser/macros_base.h
     common/parser/run_base.h
-    common/parser/weight_base.h
-    common/token/pos.cpp
-    common/token/pos.h
-    common/token/tagset.h
-    common/token/token.h
-    common/token/word.cpp
-    common/token/word.h
+        common/parser/old_weight_base.h
+        common/oldtoken/pos.cpp
+        common/oldtoken/pos.h
+        common/oldtoken/tagset.h
+        common/oldtoken/token.h
+        common/oldtoken/word.cpp
+        common/oldtoken/word.h
     include/learning/perceptron/packed_score.h
     include/learning/perceptron/score.h
     include/learning/perceptron/score_array.h

@@ -4,10 +4,10 @@
 #include "stdafx.h"
 
 #include "arceager_macros.h"
-#include "common/parser/weight_base.h"
+#include "common/parser/old_weight_base.h"
 
 namespace arceager {
-	class Weight : public WeightBase {
+	class Weight : public WeightBaseOld {
 	public:
 
 		DWord * m_pWords;

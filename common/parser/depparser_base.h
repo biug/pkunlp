@@ -4,7 +4,7 @@
 #include "stdafx.h"
 
 #include "include/learning/perceptron/score.h"
-#include "common/parser/weight_base.h"
+#include "common/parser/old_weight_base.h"
 
 enum ParserState {
 	TRAIN = 1,
@@ -14,7 +14,7 @@ enum ParserState {
 
 class DepParserBase {
 protected:
-	WeightBase* m_Weight;
+	WeightBaseOld* m_Weight;
 	int m_nState;
 
 public:

@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 #include "ngram.h"
-#include "common/token/token.h"
+#include "common/oldtoken/token.h"
 
 #define NULL_SUPERTAG	"_"
 
@@ -45,13 +45,13 @@ struct DepRightArc {
 };
 
 struct CoNLL08DepNode {
-	ttoken m_sWord;
-	ttoken m_sPOSTag;
-	ttoken m_sSuperTag;
+	ttokenold m_sWord;
+	ttokenold m_sPOSTag;
+	ttokenold m_sSuperTag;
 	int m_nTreeHead;
 	int m_nSuperTagCode;
 
-	std::vector<std::pair<int, ttoken>> m_vecRightArcs;
+	std::vector<std::pair<int, ttokenold>> m_vecRightArcs;
 	std::vector<std::pair<int, std::pair<int, int>>> m_vecRightLabels;
 
 	CoNLL08DepNode();
@@ -87,7 +87,7 @@ public:
 	CoNLL08DepGraph & operator+=(const CoNLL08DepGraph & g);
 	CoNLL08DepGraph operator-();
 	std::pair<CoNLL08DepGraph, CoNLL08DepGraph> splitPlanar(bool planar = true);
-	void setTagsAndLabels(const Token & labels, const Token & supertags, const std::vector<int> & vecLabels);
+	void setTagsAndLabels(const TokenOld & labels, const TokenOld & supertags, const std::vector<int> & vecLabels);
 
 	CoNLL08DepGraph treeOrderGraph();
 	bool checkArc(const CoNLL08DepGraph & g);

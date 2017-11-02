@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "include/ngram.h"
-#include "common/token/token.h"
+#include "common/oldtoken/token.h"
 
 #define MAX_SENTENCE_SIZE 256
 #define MAX_SENTENCE_BITS 8
@@ -50,10 +50,10 @@ typedef gtype Word;
 typedef gtype POSTag;
 typedef gtype SuperTag;
 
-typedef Token DWord;
-typedef Token DPOSTag;
-typedef Token DSuperTag;
-typedef Token DLabel;
+typedef TokenOld DWord;
+typedef TokenOld DPOSTag;
+typedef TokenOld DSuperTag;
+typedef TokenOld DLabel;
 
 typedef BiGram<gtype> TwoInts;
 typedef BiGram<gtype> TwoWords;
@@ -97,10 +97,10 @@ typedef QuinGram<gtype> WordPOSTagPOSTagPOSTagInt;
 typedef HexaGram<gtype> POSTagSet5Int;
 typedef HexaGram<gtype> WordPOSTagPOSTagPOSTagPOSTagInt;
 
-typedef std::tuple<ttoken, ttoken> POSTaggedWord;
-typedef std::tuple<POSTaggedWord, int, ttoken> DependencyTreeNode;
+typedef std::tuple<ttokenold, ttokenold> POSTaggedWord;
+typedef std::tuple<POSTaggedWord, int, ttokenold> DependencyTreeNode;
 typedef std::pair<DependencyTreeNode, std::vector<int>> DependencyPathTreeNode;
-typedef std::pair<DependencyTreeNode, ttoken> DependencyTaggedTreeNode;
+typedef std::pair<DependencyTreeNode, ttokenold> DependencyTaggedTreeNode;
 
 typedef std::vector<POSTaggedWord> Sentence;
 typedef std::vector<DependencyTreeNode> DependencyTree;

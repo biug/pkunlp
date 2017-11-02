@@ -107,7 +107,7 @@ inline const std::unordered_map<int, Score> & ActionScores<RET_TYPE>::getScores(
 
 template<class RET_TYPE>
 std::istream & operator>>(std::istream & is, ActionScores<RET_TYPE> & s) {
-	ttoken token;
+	ttokenold token;
 	int index;
 	cscore cs;
 	tscore ts;

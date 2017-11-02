@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 
-#include "common/token/token.h"
+#include "common/oldtoken/token.h"
 
 template<typename KEY_TYPE>
 inline void hash_combine(std::size_t & seed, const KEY_TYPE & key) {
@@ -67,7 +67,7 @@ public:
 	}
 
 	friend std::istream & operator>>(std::istream & is, BiGram<KEY_TYPE>& bigram) {
-		ttoken token;
+		ttokenold token;
 		is >> token >> bigram.gram1 >> bigram.gram2 >> token;
 		bigram.computeHash();
 		return is;
@@ -142,7 +142,7 @@ public:
 	}
 
 	friend std::istream & operator>>(std::istream & is, TriGram<KEY_TYPE>& trigram) {
-		ttoken token;
+		ttokenold token;
 		is >> token >> trigram.gram1 >> trigram.gram2 >> trigram.gram3 >> token;
 		trigram.computeHash();
 		return is;
@@ -224,7 +224,7 @@ public:
 	}
 
 	friend std::istream & operator>>(std::istream & is, QuarGram<KEY_TYPE>& quargram) {
-		ttoken token;
+		ttokenold token;
 		is >> token >> quargram.gram1 >> quargram.gram2 >> quargram.gram3 >> quargram.gram4 >> token;
 		quargram.computeHash();
 		return is;
@@ -313,7 +313,7 @@ public:
 	}
 
 	friend std::istream & operator>>(std::istream & is, QuinGram<KEY_TYPE>& quingram) {
-		ttoken token;
+		ttokenold token;
 		is >> token >> quingram.gram1 >> quingram.gram2 >> quingram.gram3 >> quingram.gram4 >> quingram.gram5 >> token;
 		quingram.computeHash();
 		return is;
@@ -385,7 +385,7 @@ public:
 	}
 
 	friend std::istream & operator>>(std::istream & is, HexaGram<KEY_TYPE>& hexagram) {
-		ttoken token;
+		ttokenold token;
 		is >> token >> hexagram.gram1 >> hexagram.gram2 >> hexagram.gram3 >> hexagram.gram4 >> hexagram.gram5 >> hexagram.gram6 >> token;
 		hexagram.computeHash();
 		return is;
@@ -458,7 +458,7 @@ public:
 	}
 
 	friend std::istream & operator>>(std::istream & is, SeptGram<KEY_TYPE>& septgram) {
-		ttoken token;
+		ttokenold token;
 		is >> token >> septgram.gram1 >> septgram.gram2 >> septgram.gram3 >> septgram.gram4 >> septgram.gram5 >> septgram.gram6 >> septgram.gram7 >> token;
 		septgram.computeHash();
 		return is;

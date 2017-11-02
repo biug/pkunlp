@@ -56,7 +56,7 @@ CoNLL08DepGraph & CoNLL08DepGraph::operator+=(const CoNLL08DepGraph & g) {
 			}
 		}
 		std::sort(m_vecNodes[i].m_vecRightArcs.begin(), m_vecNodes[i].m_vecRightArcs.end(),
-				[](const std::pair<int, ttoken> & p1, const std::pair<int, ttoken> & p2) { return p1.first < p2.first; });
+				[](const std::pair<int, ttokenold> & p1, const std::pair<int, ttokenold> & p2) { return p1.first < p2.first; });
 	}
 	return *this;
 }
@@ -71,7 +71,7 @@ CoNLL08DepGraph CoNLL08DepGraph::operator-() {
 	}
 	for (int i = 0, n = size(); i < n; ++i) {
 		for (const auto & arc : m_vecNodes[i].m_vecRightArcs) {
-			graph[n - arc.first - 1].m_vecRightArcs.push_back(std::pair<int, ttoken>(n - i - 1,
+			graph[n - arc.first - 1].m_vecRightArcs.push_back(std::pair<int, ttokenold>(n - i - 1,
 					IS_LEFT_LABEL(arc.second) ? ENCODE_RIGHT_LABEL(DECODE_LEFT_LABEL(arc.second)) :
 							IS_RIGHT_LABEL(arc.second) ? ENCODE_LEFT_LABEL(DECODE_RIGHT_LABEL(arc.second)) :
 									ENCODE_TWOWAY_LABEL(DECODE_TWOWAY_RIGHT_LABEL(arc.second), DECODE_TWOWAY_LEFT_LABEL(arc.second))));
@@ -79,7 +79,7 @@ CoNLL08DepGraph CoNLL08DepGraph::operator-() {
 	}
 	for (auto && node : graph) {
 		std::sort(node.m_vecRightArcs.begin(), node.m_vecRightArcs.end(),
-				[](const std::pair<int, ttoken> & p1, const std::pair<int, ttoken> & p2) { return p1.first < p2.first; });
+				[](const std::pair<int, ttokenold> & p1, const std::pair<int, ttokenold> & p2) { return p1.first < p2.first; });
 	}
 	return graph;
 }
@@ -184,7 +184,7 @@ std::pair<CoNLL08DepGraph, CoNLL08DepGraph> CoNLL08DepGraph::splitPlanar(bool pl
 				if (!planar || bNoCrossing) {
 					rightArcs.push_back(*itr);
 					std::sort(rightArcs.begin(), rightArcs.end(),
-							[](const std::pair<int, ttoken> & p1, const std::pair<int, ttoken> & p2) { return p1.first < p2.first; });
+							[](const std::pair<int, ttokenold> & p1, const std::pair<int, ttokenold> & p2) { return p1.first < p2.first; });
 				}
 				// remove maxArc from parts.first
 				deleteNode.erase(itr);
@@ -195,7 +195,7 @@ std::pair<CoNLL08DepGraph, CoNLL08DepGraph> CoNLL08DepGraph::splitPlanar(bool pl
 	return parts;
 }
 
-void CoNLL08DepGraph::setTagsAndLabels(const Token & labels, const Token & supertags, const std::vector<int> & vecLabels) {
+void CoNLL08DepGraph::setTagsAndLabels(const TokenOld & labels, const TokenOld & supertags, const std::vector<int> & vecLabels) {
 	for (auto && node : m_vecNodes) {
 		node.m_nSuperTagCode = supertags.find(node.m_sSuperTag);
 		node.m_vecRightLabels.clear();
@@ -405,7 +405,7 @@ CoNLL08DepGraph CoNLL08DepGraph::treeOrderGraph() {
 	std::vector<int> treeOrder;
 	std::vector<int> treeOrderInverse;
 	std::vector<std::set<int>> childrens;
-	typedef std::tuple<int, int, ttoken> tArc;
+	typedef std::tuple<int, int, ttokenold> tArc;
 	std::vector<tArc> arcs;
 	for (int i = 0; i < len; ++i) {
 		childrens.push_back(std::set<int>());
@@ -470,7 +470,7 @@ CoNLL08DepGraph CoNLL08DepGraph::treeOrderGraph() {
 		node.m_vecRightArcs.clear();
 		for (const auto & arc : arcs) {
 			if (std::get<0>(arc) == i) {
-				node.m_vecRightArcs.push_back(std::pair<int, ttoken>(std::get<1>(arc), std::get<2>(arc)));
+				node.m_vecRightArcs.push_back(std::pair<int, ttokenold>(std::get<1>(arc), std::get<2>(arc)));
 			}
 		}
 	}
@@ -559,7 +559,7 @@ CoNLL08DepGraph operator+(const CoNLL08DepGraph & g1, const CoNLL08DepGraph & g2
 					if (IS_LEFT_LABEL(itr1->second)) {
 						if (IS_RIGHT_LABEL(itr2->second)) {
 							graph[i].m_vecRightArcs.push_back(
-								std::pair<int, ttoken>(itr1->first,
+								std::pair<int, ttokenold>(itr1->first,
 								ENCODE_TWOWAY_LABEL(DECODE_LEFT_LABEL(itr1->second), DECODE_RIGHT_LABEL(itr2->second))));
 						}
 						else {
@@ -569,7 +569,7 @@ CoNLL08DepGraph operator+(const CoNLL08DepGraph & g1, const CoNLL08DepGraph & g2
 					else if (IS_RIGHT_LABEL(itr1->second)) {
 						if (IS_LEFT_LABEL(itr2->second)) {
 							graph[i].m_vecRightArcs.push_back(
-								std::pair<int, ttoken>(itr1->first,
+								std::pair<int, ttokenold>(itr1->first,
 								ENCODE_TWOWAY_LABEL(DECODE_LEFT_LABEL(itr2->second), DECODE_RIGHT_LABEL(itr1->second))));
 						}
 						else {
@@ -616,9 +616,9 @@ CoNLL08DepGraph operator-(const CoNLL08DepGraph & g1, const CoNLL08DepGraph & g2
 }
 
 std::istream & operator>>(std::istream & is, CoNLL08DepGraph & graph) {
-	ttoken line, token;
+	ttokenold line, token;
 	std::vector<int> heads;
-	typedef std::tuple<int, int, ttoken> tArcs;
+	typedef std::tuple<int, int, ttokenold> tArcs;
 	std::vector<tArcs> arcs;
 
 	graph.clear();
@@ -642,7 +642,7 @@ std::istream & operator>>(std::istream & is, CoNLL08DepGraph & graph) {
 			heads.push_back(graph.size());
 		}
 		int i = 0;
-		std::vector<std::tuple<int, ttoken>> rightArcs;
+		std::vector<std::tuple<int, ttokenold>> rightArcs;
 		while (issLine >> token) {
 			if (token != "_") {
 				if (i < heads.size() && heads[i] != graph.size()) {
@@ -681,7 +681,7 @@ std::istream & operator>>(std::istream & is, CoNLL08DepGraph & graph) {
 			rightArcs.back().second = ENCODE_TWOWAY_LABEL(DECODE_LEFT_LABEL(rightArcs.back().second), DECODE_RIGHT_LABEL(std::get<2>(arc)));
 		}
 		else {
-			rightArcs.push_back(std::pair<int, ttoken>(std::get<1>(arc), std::get<2>(arc)));
+			rightArcs.push_back(std::pair<int, ttokenold>(std::get<1>(arc), std::get<2>(arc)));
 		}
 	}
 	return is;
@@ -689,7 +689,7 @@ std::istream & operator>>(std::istream & is, CoNLL08DepGraph & graph) {
 
 std::ostream & operator<<(std::ostream & os, const CoNLL08DepGraph & graph) {
 	std::set<int> heads;
-	std::map<int, std::map<int, ttoken>> arcs;
+	std::map<int, std::map<int, ttokenold>> arcs;
 	int i = 0;
 	for (const auto & node : graph) {
 		for (const auto & arc : node.m_vecRightArcs) {

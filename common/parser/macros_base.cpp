@@ -101,7 +101,7 @@ std::string nCharNext(const Sentence & sent, int index, int n) {
 
 std::istream & operator>>(std::istream & input, Sentence & sentence) {
 	sentence.clear();
-	ttoken line, token;
+	ttokenold line, token;
 	std::getline(input, line);
 	std::istringstream iss(line);
 	while (iss >> token) {
@@ -113,7 +113,7 @@ std::istream & operator>>(std::istream & input, Sentence & sentence) {
 
 std::istream & operator>>(std::istream & input, DependencyTree & tree) {
 	tree.clear();
-	ttoken line, token;
+	ttokenold line, token;
 	while (true) {
 		std::getline(input, line);
 		if (line.empty()) {
@@ -129,7 +129,7 @@ std::istream & operator>>(std::istream & input, DependencyTree & tree) {
 
 std::istream & operator>>(std::istream & input, DependencyPathTree & tree) {
 	tree.clear();
-	ttoken line, token;
+	ttokenold line, token;
 	while (true) {
 		std::getline(input, line);
 		if (line.empty()) {
@@ -149,7 +149,7 @@ std::istream & operator>>(std::istream & input, DependencyPathTree & tree) {
 
 std::istream & operator>>(std::istream & input, DependencyTaggedTree & tree) {
 	tree.clear();
-	ttoken line, token;
+	ttokenold line, token;
 	while (true) {
 		std::getline(input, line);
 		if (line.empty()) {

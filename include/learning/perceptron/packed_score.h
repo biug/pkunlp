@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "score.h"
-#include "common/token/token.h"
+#include "common/oldtoken/token.h"
 
 template<typename KEY_TYPE, typename VAL_TYPE = Score, typename RET_TYPE = tscore, typename UPDATE_TYPE = int>
 class PackedScoreMap {
@@ -63,7 +63,7 @@ public:
 		VAL_TYPE sc;
 		int number;
 		KEY_TYPE key;
-		ttoken token;
+		ttokenold token;
 
 		psm.m_mapScores.clear();
 		is >> psm.m_sName >> psm.m_nCount;

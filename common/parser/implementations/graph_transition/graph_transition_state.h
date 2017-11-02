@@ -203,7 +203,7 @@ inline void GraphTransitionStateBase::generateGraph(const DependencyGraph & sent
 		tree.add(sent[i]);
 		tree.back().m_vecRightArcs.clear();
 		for (const auto & arc : m_vecRightArcs[i]) {
-			tree.back().m_vecRightArcs.push_back(std::pair<int, ttoken>(arc.head, labels.key(arc.label)));
+			tree.back().m_vecRightArcs.push_back(std::pair<int, ttokenold>(arc.head, labels.key(arc.label)));
 		}
 		if (supertags.count() > 0) {
 			tree.back().m_sSuperTag = supertags.key(m_lSuperTag[i]);

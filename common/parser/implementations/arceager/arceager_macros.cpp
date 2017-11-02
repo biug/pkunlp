@@ -7,7 +7,7 @@
 #include "arceager_macros.h"
 
 std::istream & operator>>(std::istream & is, arceager::ActionScores & s) {
-	ttoken token;
+	ttokenold token;
 	int index;
 	cscore cs;
 	tscore ts;

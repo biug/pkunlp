@@ -7,7 +7,7 @@
 #include <cstring>
 #include <unordered_map>
 
-#include "common/token/tagset.h"
+#include "common/oldtoken/tagset.h"
 #include "common/parser/macros_base.h"
 #include "include/dependency_primitive.h"
 #include "include/learning/perceptron/score_array.h"
@@ -23,7 +23,7 @@ inline unsigned int encodePOSTagSet4(const unsigned int & t1, const unsigned int
 	return ((t1 << 24) | (t2 << 16) | (t3 << 8) | t4);
 }
 
-typedef TagSetN<2> TagSet;
+typedef TagSetNOld<2> TagSet;
 
 typedef CoNLL08DepNode DependencyGraphNode;
 typedef CoNLL08DepGraph DependencyGraph;
@@ -83,7 +83,7 @@ void loadLabels(ACTION_TYPE & actions, const DLabel & labels) {
 	std::unordered_map<std::string, int> labelMap;
 
 	for (int i = labels.start(); i < labels.end(); ++i) {
-		const ttoken & label = labels.key(i);
+		const ttokenold & label = labels.key(i);
 		if (IS_LEFT_LABEL(label)) {
 			if (labelMap.find(DECODE_LEFT_LABEL(label)) == labelMap.end()) {
 				labelMap[DECODE_LEFT_LABEL(label)] = ++count;

@@ -4,9 +4,10 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 #include <unordered_map>
 
-#include "common/token/token.h"
+#include "common/oldtoken/token.h"
 #include "common/parser/macros_base.h"
 
 typedef int cscore;
@@ -48,7 +49,7 @@ public:
 	void shrink(const double & round, const double & threshold);
 
 	friend std::istream & operator>>(std::istream & is, Score & s) {
-		ttoken token;
+		ttokenold token;
 		is >> s.m_nCurrent >> token >> s.m_nTotal;
 		return is;
 	}

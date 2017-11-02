@@ -5,7 +5,7 @@
 
 namespace arceager {
 	Weight::Weight(const std::string & sRead, const std::string & sRecord, DWord * words, DPOSTag * postags, DLabel * labels) :
-		WeightBase(sRead, sRecord),
+		WeightBaseOld(sRead, sRecord),
 		m_pWords(words),
 		m_pPOSTags(postags),
 		m_pLabels(labels),

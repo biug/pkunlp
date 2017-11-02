@@ -11,7 +11,7 @@
 #include "graph_transition_macros.h"
 
 std::istream & operator>>(std::istream & input, SuperTagCandidates & stc) {
-	ttoken line;
+	ttokenold line;
 	int size, key, candidate;
 	input >> size;
 	std::getline(input, line);

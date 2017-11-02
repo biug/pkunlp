@@ -9,8 +9,8 @@
 #include <unordered_set>
 
 #include "seg_depparser.h"
-#include "common/token/word.h"
-#include "common/token/pos.h"
+#include "common/oldtoken/word.h"
+#include "common/oldtoken/pos.h"
 #include "seg_macros.h"
 #include <regex>
 
@@ -287,7 +287,7 @@ namespace Segment {
 			}
 			now = makestring(l + 1, r);
 			m_Weight->map_words.code(*itr);
-			//TWord::code(pre + "T.T" + now);
+			//TWordOld::code(pre + "T.T" + now);
 			pre = now;
 		}
 		toMyString_UTF8(END_WORD);
@@ -448,7 +448,7 @@ namespace Segment {
 		for (int s = -5; s < 0; s++)
 		{
 			flag = m_Weight->map_words.getTokenizer().find(makestring(s + 5, 5));
-			//flag = TWord::code(makestring(s + 5, 5));
+			//flag = TWordOld::code(makestring(s + 5, 5));
 			//if (flag != 0 && amount == 0 && cur_tag == 1 && pre_tag == 1 ) std::cout << s << ' '<< position << ' '<<flag<<std::endl;
 			if (flag > 0)
 			{
@@ -460,7 +460,7 @@ namespace Segment {
 		for (int e = 1; e < 6; e++)
 		{
 			flag = m_Weight->map_words.getTokenizer().find(makestring(5, e + 5));
-			//flag = TWord::code(makestring(5, e + 5));
+			//flag = TWordOld::code(makestring(5, e + 5));
 			if (flag > 0)
 			{
 				pos_idw_tag_int2.refer(e, flag, cur_tag, 0);

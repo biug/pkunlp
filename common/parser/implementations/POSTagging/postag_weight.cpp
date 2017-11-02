@@ -2,8 +2,8 @@
 #include <fstream>
 
 #include "postag_weight.h"
-#include "common/token/word.h"
-#include "common/token/pos.h"
+#include "common/oldtoken/word.h"
+#include "common/oldtoken/pos.h"
 #include "include/ngram.h"
 
 namespace POSTagging {

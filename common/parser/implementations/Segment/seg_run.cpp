@@ -9,7 +9,7 @@
 #include "seg_run.h"
 #include "seg_depparser.h"
 #include "seg_macros.h"
-#include "common/token/word.h"
+#include "common/oldtoken/word.h"
 
 namespace Segment {
 

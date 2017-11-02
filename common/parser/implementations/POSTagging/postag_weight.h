@@ -2,9 +2,9 @@
 #define _POSTAG_WEIGHT_H
 
 #include "postag_macros.h"
-#include "common/token/word.h"
-#include "common/token/pos.h"
-#include "common/parser/weight_base.h"
+#include "common/oldtoken/word.h"
+#include "common/oldtoken/pos.h"
+#include "common/parser/old_weight_base.h"
 #include "include/learning/perceptron/packed_score.h"
 
 namespace POSTagging {
@@ -17,8 +17,8 @@ namespace POSTagging {
 
 	public:
 
-		TWord map_words;
-		TPOSTag map_postags;
+		TWordOld map_words;
+		TPOSTagOld map_postags;
 	public:
 
 		WordTagIntMap map_word_tag_int;

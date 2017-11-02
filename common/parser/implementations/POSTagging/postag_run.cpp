@@ -9,7 +9,7 @@
 #include "postag_run.h"
 #include "postag_depparser.h"
 #include "postag_macros.h"
-#include "common/token/word.h"
+#include "common/oldtoken/word.h"
 
 namespace POSTagging {
 

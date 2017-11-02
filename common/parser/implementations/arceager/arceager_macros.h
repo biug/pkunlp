@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-#include "common/token/tagset.h"
+#include "common/oldtoken/tagset.h"
 #include "common/parser/agenda.h"
 #include "common/parser/macros_base.h"
 #include "include/learning/perceptron/packed_score.h"
@@ -108,7 +108,7 @@ namespace arceager {
 #define ENCODE_POSTAG_SET_2(T1, T2)		(((T1) << 8) | (T2))
 #define ENCODE_POSTAG_SET_3(T1, T2, T3)	(((T1) << 16) | ((T2) << 8) | (T3))
 
-	typedef TagSetN<3> SetOfDepLabels;
+	typedef TagSetNOld<3> SetOfDepLabels;
 
 	typedef PackedScoreMap<Int, ActionScores, PackedScoreType, ActionScoreIncrement> IntMap;
 	typedef PackedScoreMap<Word, ActionScores, PackedScoreType, ActionScoreIncrement> WordMap;
