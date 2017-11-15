@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
+#include <cmath>
 
 #include "common/oldtoken/token.h"
 #include "common/parser/macros_base.h"
