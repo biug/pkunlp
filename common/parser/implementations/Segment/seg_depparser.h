@@ -53,7 +53,7 @@ namespace Segment {
 		int totaltagerr;
 		int totaltagcor;
 		int testround;
-		std::set<Char> num_set;
+		std::set<Char> num_set,pun_set;
 
 		int prewordint, nowwordint, nextwordint, preprewordint, nextnextwordint;
 		std::string preword, nowword, nextword;
