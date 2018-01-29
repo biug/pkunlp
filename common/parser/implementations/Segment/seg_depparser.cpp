@@ -392,12 +392,6 @@ namespace Segment {
 		}			
 		
 		totaltag += half_sent.size();
-		if (testround % 100 == 0) {
-			std::cout << testround << " done\n";
-			//std::cout << m_nTotalErrors << " / " << testround << ' ' << 1 - 1.0*m_nTotalErrors / testround << std::endl;
-			//std::cout << totaltagcor << " / " << totaltag << ' ' << 1.0 * totaltagcor / totaltag << std::endl;
-
-		}
 	}
 
 	void DepParser::getOrUpdateStackScore(int position, POSTag pre_tag, POSTag cur_tag , int amount) {//缁熼敓鏂ゆ嫹feature vector

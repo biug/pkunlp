@@ -80,7 +80,6 @@ LIBGRASS_API int create_segmentor_ctx(const std::string & feature_file, const st
 	int idx = (int) segmentors.size();
 	Segment::Run* new_segmentor = new Segment::Run();
 	new_segmentor->initParser(feature_file, feature_file, dict_file, true);
-	std::cout << "segmentor " << idx << "created" << std::endl;
 	segmentors.push_back(new_segmentor);
 	return idx;
 }
@@ -171,7 +170,6 @@ LIBGRASS_API int create_postagger_ctx(const std::string & feature_file)
     POSTagging::Run *newPostagger = new POSTagging::Run();
     postaggers.push_back(newPostagger);
     newPostagger->initParser(feature_file, feature_file, "", true);
-    std::cout << "postagger " << idx << " created" << std::endl;
     return idx;
 }
 
@@ -305,7 +303,6 @@ LIBGRASS_API int create_syntax_parser_ctx(const std::string & feature_file)
     newSyntaxParser->m_AC.AL_END = newSyntaxParser->m_AC.AR_FIRST = newSyntaxParser->m_AC.AL_FIRST + newSyntaxParser->m_tLabels.count();
     newSyntaxParser->m_AC.AR_END = newSyntaxParser->m_AC.AR_FIRST + newSyntaxParser->m_tLabels.count();
 
-    std::cout << "syntax parser " << idx << " created" << std::endl;
     return idx;
 }
 
@@ -401,7 +398,6 @@ LIBGRASS_API int create_semantic_parser_ctx(const std::string & semantic_feature
     semanticParsers.push_back(newSemanticParser);
     psdtrParsers.push_back(newPsdtrParser);
 
-	std::cout << "sematic parser " << idx << " created" << std::endl;
 
     return idx;
 }

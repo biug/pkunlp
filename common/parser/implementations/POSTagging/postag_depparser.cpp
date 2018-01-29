@@ -274,9 +274,6 @@ namespace POSTagging {
 		totaltag += sentencelength;
 
 		work(retval, correctTagSentence , false, test);
-
-		if (testround % 100 == 0)
-			std::cout << testround << " done" << std::endl;
 	}
 
 	void DepParser::getOrUpdateStackScore(int position, POSTag pre_pre_tag, POSTag pre_tag, POSTag cur_tag , int amount) {//统锟斤拷feature vector
