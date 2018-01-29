@@ -549,7 +549,10 @@ namespace Segment {
 			int ch = charsentence[i];
 			if ( pun_set.find(ch) != pun_set.end() && tagintsentence[i] == -1) {
 				tagintsentence[i] = m_Weight->map_postags.code("S");
-				tagintsentence[i - 1] = tagintsentence[i + 1] = -1;
+				if (tagintsentence[i - 1] != m_Weight->map_postags.code("S"))
+					tagintsentence[i - 1] = -1;
+				if (tagintsentence[i + 1] != m_Weight->map_postags.code("S"))
+					tagintsentence[i + 1] = -1;
 			}
 		}
 		
