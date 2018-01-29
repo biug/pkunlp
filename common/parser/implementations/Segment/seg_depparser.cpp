@@ -131,6 +131,10 @@ namespace Segment {
 					15043971,14989447,14990015,15041926,15172281,15250591,14989476,
 					'0','1', '2', '3', '4', '5', '6', '7', '8', '9', '.','%'};
 		num_set.insert(num, num + sizeof(num) / sizeof(num[0]));
+		
+		Char pun[] = { '#','(',')','[',']','{','}','<','>',';','-',':' };
+
+		pun_set.insert(pun, pun + sizeof(pun) / sizeof(pun[0]));
 	}
 
 	DepParser::~DepParser() {
@@ -539,6 +543,16 @@ namespace Segment {
 					else 
 						state = NORM_STATE;					
 				}				
+			}
+		}
+		for (int i = 1; i <= sentencelength; i++) {
+			int ch = charsentence[i];
+			if ( pun_set.find(ch) != pun_set.end() && tagintsentence[i] == -1) {
+				tagintsentence[i] = m_Weight->map_postags.code("S");
+				if (tagintsentence[i - 1] != m_Weight->map_postags.code("S"))
+					tagintsentence[i - 1] = -1;
+				if (tagintsentence[i + 1] != m_Weight->map_postags.code("S"))
+					tagintsentence[i + 1] = -1;
 			}
 		}
 		
