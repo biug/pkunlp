@@ -386,7 +386,7 @@ LIBGRASS_API int create_semantic_parser_ctx(const std::string & semantic_feature
     titov::DepParser<PackedScoreType> *newSemanticParser =
             new titov::DepParser<PackedScoreType>("",
                                                   semantic_feature_file, semantic_feature_file,
-                                                  ParserState::PARSE, true, true, false);
+                                                  ParserState::PARSE, true, tree_feature_file.size()?true:false, false);
 
     arceager::DepParser *newPsdtrParser = new arceager::DepParser(
             tree_feature_file, tree_feature_file, ParserState::PARSE); 
