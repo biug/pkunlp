@@ -2,24 +2,21 @@ import cn.edu.pku.icst.lcwm.grass.*;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Map;
 
 public class TestAll {
     public static void main(String[] args) throws FileNotFoundException {
-//        Segmentor s = new Segmentor("segment.feat",
-//                "segment.dic");
         DocumentSegmentor s = new DocumentSegmentor(
                 "feature/docsegfeature_ctb9.0_compname_feat11",
                 "feature/as+cu+msr+pku+sogou+comp");
-        String[] segResult = s.segString(
-                "在第31届夏季奥林匹克运动会上，中国女子排球队永不放弃、拼搏到底，" +
-                        "时隔12年重返世界之巅，中国女排姑娘们展现出了一辈辈传承至" +
-                        "今的女排精神，再一次感动了国人、振奋了国人。");
+        String[] segResult;
+        segResult = s.segString("五个常任理事国：中国、法国、俄罗斯、英国、美国。");
         System.out.println(segResult.length);
         for (String i : segResult) {
             System.out.print(i + " ");
         }
 
-        POSTaggerV2 p = new POSTaggerV2("feature/postag.feat");
+        POSTaggerV2 p = new POSTaggerV2("feature/postag_withpuw_new.feat");
         List<POSTaggerV2.Pair> posResult = p.tagSentence(segResult);
         for (POSTaggerV2.Pair i : posResult) {
             System.out.print(i + " ");
@@ -28,13 +25,17 @@ public class TestAll {
 
 
         SyntaxParserV2 parser = new SyntaxParserV2("http://www.icst.pku.edu.cn/lcwm/pkunlp/api");
+//        SyntaxParserV2 parser = new SyntaxParserV2("http://127.0.0.1:22233/api");
         System.out.println(parser.parse(posResult));
 
-        String inputString = "5个常任理事国: 中国、法国、俄罗斯、英国、美国。";
-        NERTagger tagger = new NERTagger("feature/nerfeat_pku");
-        List<NERTagger.Pair> result = tagger.tagSentence(inputString);
-        for (NERTagger.Pair pair : result) {
-            System.out.println(pair);
+        String inputString = "2016年9月1日,曹俊杰在中国上北京大学，学费$24，980,684.21。今年,曹俊杰在中国上清华大学，学费5300.00日元。";
+        NERTaggerV2 tagger = new NERTaggerV2("feature/nerfeat_pku", s, p);
+        Map<String, List<NERTaggerV2.Pair>> result = tagger.tagSentence(inputString);
+        for(Map.Entry<String, List<NERTaggerV2.Pair>> e : result.entrySet()) {
+        	System.out.println(e.getKey() + ":");
+        	for(NERTaggerV2.Pair pair : e.getValue()) {
+        		System.out.println("  "+ pair.word + "  " + pair.start + "  " + pair.end);
+        	}
         }
     }
 }
