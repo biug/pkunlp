@@ -26,11 +26,7 @@ public class DocumentSegmentor {
     public String[] segString(String input) {
         ArrayList<String> ret = new ArrayList<>();
         GrassNER.INSTANCE.parse_string_with_docseg_parser(this.segmentor, input,
-                (words, length) -> {
-                    for (int i = 0; i < length; i++) {
-                        ret.add(words[i]);
-                    }
-                });
+                ret::add);
         return ret.toArray(new String[0]);
     }
 

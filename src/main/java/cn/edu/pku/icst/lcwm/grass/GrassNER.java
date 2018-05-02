@@ -11,7 +11,7 @@ public interface GrassNER extends Library {
     }
 
     interface docseg_callback_t extends Callback {
-        void invoke(String[] words, int length);
+        void invoke(String word);
     }
 
     interface callback_position_t extends Callback {
