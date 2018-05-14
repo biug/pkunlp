@@ -10,6 +10,7 @@ import java.util.regex.*;
 public class NERTaggerV2 {
     static final String PERSON = "PER", LOCATION = "LOC", ORGANIZATION = "ORG", TIME = "TIM", CURRENCY = "CUR";
     private NERTagger ner_tagger;
+    private NERTagger org_tagger;
     private DocumentSegmentor seg_tagger;
     private POSTaggerV2 pos_tagger;
 
@@ -26,12 +27,27 @@ public class NERTaggerV2 {
         public String toString() {
             return "[word=" + word + ",start=" + start + ",end=" + end + "]";
         }
+	
+	public boolean equals(Object obj) {  
+        if(obj == null) return false;  
+        if(this == obj) return true;  
+        if(obj instanceof NERTaggerV2.Pair){   
+            NERTaggerV2.Pair p =(NERTaggerV2.Pair)obj;   
+            if(p.start == this.start && p.end == this.end && p.word.equals(this.word)) return true;  
+            }  
+        return false;  
+    	}
+
+	public int hashCode() {  
+        return start * end * word.hashCode();    
+    	}  
     }
 
-    public NERTaggerV2(String nerFeatureFile,
+    public NERTaggerV2(String nerFeatureFile,String orgFeatureFile,
                        DocumentSegmentor segmentor,
                        POSTaggerV2 posTagger) throws FileNotFoundException {
         ner_tagger = new NERTagger(nerFeatureFile);
+	org_tagger = new NERTagger(orgFeatureFile);
         seg_tagger = segmentor;
         pos_tagger = posTagger;
     }
@@ -97,6 +113,27 @@ public class NERTaggerV2 {
             ner_list.get(NERTaggerV2.TIME).add(new Pair(s + 1, e, w));
         }
     }
+	
+    public void tagOrganization(Map<String, List<NERTaggerV2.Pair>> ner_list, String inputString) {
+        inputString = toDBC(inputString);
+        List<NERTagger.Pair> result = org_tagger.tagSentence(inputString);
+        int already = 0;
+        for (NERTagger.Pair pair : result) {
+            int start = already + inputString.substring(already).indexOf(pair.getWord()) + 1;
+            int end = start + pair.getWord().length() - 1;
+            switch (pair.getTag()) {
+                case NERTaggerV2.ORGANIZATION: {
+                    ner_list.get(NERTaggerV2.ORGANIZATION).add(new NERTaggerV2.Pair(start, end, pair.getWord()));
+                    break;
+                }
+            }
+            already = end;
+        }
+    }
+
+    
+
+
 
     public Map<String, List<NERTaggerV2.Pair>> tagSentence(String inputString) {
         inputString = toDBC(inputString);
@@ -129,11 +166,45 @@ public class NERTaggerV2 {
             }
             already = end;
         }
+	// 识别机构
+        tagOrganization(ner_list, inputString);
         // 识别货币
         tagCurrency(ner_list, inputString);
         // 识别时间
         tagTime(ner_list, inputString);
 
-        return ner_list;
+        Map<String, List<NERTaggerV2.Pair>> ans_ner_list = new TreeMap<String, List<NERTaggerV2.Pair>>();
+	for (String str : ner_type) {
+            ans_ner_list.put(str, new ArrayList<NERTaggerV2.Pair>());
+        }
+
+	
+	List<String> st=new ArrayList<String>();
+	
+	//ORG去重
+	for(Map.Entry<String, List<Pair>> e : ner_list.entrySet()) {
+		if(e.getKey().equals("ORG"))
+		{
+			List<NERTaggerV2.Pair> orgs = new ArrayList<NERTaggerV2.Pair>(new HashSet<NERTaggerV2.Pair>(e.getValue()));
+			for(NERTaggerV2.Pair p :orgs)
+			{
+				ans_ner_list.get(NERTaggerV2.ORGANIZATION).add(new NERTaggerV2.Pair(p.start,p.end,p.word));
+				st.add(p.word);
+			}			
+		}
+        }
+	//ORG优先策略
+        for(Map.Entry<String, List<Pair>> e : ner_list.entrySet()) {
+		if(!e.getKey().equals("ORG"))
+		{
+			for(NERTaggerV2.Pair p : e.getValue()) {
+			if(!st.contains(p.word))
+        		ans_ner_list.get(e.getKey()).add(new NERTaggerV2.Pair(p.start,p.end,p.word));
+        		}	
+		}
+        }
+	
+
+        return ans_ner_list;
     }
 }
