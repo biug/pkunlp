@@ -119,11 +119,12 @@ public class NERTaggerV2 {
         List<NERTagger.Pair> result = org_tagger.tagSentence(inputString);
         int already = 0;
         for (NERTagger.Pair pair : result) {
-            int start = already + inputString.substring(already).indexOf(pair.getWord()) + 1;
-            int end = start + pair.getWord().length() - 1;
-            switch (pair.getTag()) {
+            String[] p = pair.toString().split("/");
+            int start = already + inputString.substring(already).indexOf(p[0]) + 1;
+            int end = start + p[0].length() - 1;
+            switch (p[1]) {
                 case NERTaggerV2.ORGANIZATION: {
-                    ner_list.get(NERTaggerV2.ORGANIZATION).add(new NERTaggerV2.Pair(start, end, pair.getWord()));
+                    ner_list.get(NERTaggerV2.ORGANIZATION).add(new NERTaggerV2.Pair(start, end, p[0]));
                     break;
                 }
             }
@@ -182,25 +183,61 @@ public class NERTaggerV2 {
 	List<String> st=new ArrayList<String>();
 	
 	//ORG去重
-	for(Map.Entry<String, List<Pair>> e : ner_list.entrySet()) {
-		if(e.getKey().equals("ORG"))
+	for(Entry<String, List<NERTaggerV2.Pair>> e : ner_list.entrySet()) {
+		if(e.getKey()=="ORG")
 		{
 			List<NERTaggerV2.Pair> orgs = new ArrayList<NERTaggerV2.Pair>(new HashSet<NERTaggerV2.Pair>(e.getValue()));
 			for(NERTaggerV2.Pair p :orgs)
 			{
-				ans_ner_list.get(NERTaggerV2.ORGANIZATION).add(new NERTaggerV2.Pair(p.start,p.end,p.word));
+				//ans_ner_list.get(NERTaggerV2.ORGANIZATION).add(new NERTaggerV2.Pair(p.start,p.end,p.word));
 				st.add(p.word);
 			}			
 		}
         }
+        
+        
+        for(Entry<String, List<NERTaggerV2.Pair>> e : ner_list.entrySet()) {
+            if(e.getKey()=="ORG")
+            {
+                List<NERTaggerV2.Pair> orgs = new ArrayList<NERTaggerV2.Pair>(new HashSet<NERTaggerV2.Pair>(e.getValue()));
+                for(NERTaggerV2.Pair p :orgs)
+                {
+                    boolean f=true;
+                    for(String org1:st)
+                    {
+                        if(!org1.equals(p.word)&&org1.contains(p.word))
+                        {
+                            f=false;
+                            break;
+                        }
+                    }
+                    if(f)
+                    ans_ner_list.get(NERTaggerV2.ORGANIZATION).add(new NERTaggerV2.Pair(p.start,p.end,p.word));
+                    
+                }			
+            }
+         }
+        
 	//ORG优先策略
-        for(Map.Entry<String, List<Pair>> e : ner_list.entrySet()) {
-		if(!e.getKey().equals("ORG"))
+        for(Entry<String, List<NERTaggerV2.Pair>> e : ner_list.entrySet()) {
+		if(e.getKey()!="ORG")
 		{
 			for(NERTaggerV2.Pair p : e.getValue()) {
 			if(!st.contains(p.word))
-        		ans_ner_list.get(e.getKey()).add(new NERTaggerV2.Pair(p.start,p.end,p.word));
-        		}	
+        	{
+                boolean f=true;
+                for(String ss:st)
+                {
+                    if(ss.contains(p.word))
+                    {
+                        f=false;
+                        break;
+                    }
+                }
+                if(f)
+                ans_ner_list.get(e.getKey()).add(new NerTagger.Pair(p.start,p.end,p.word));
+            }	
+        	}	
 		}
         }
 	
